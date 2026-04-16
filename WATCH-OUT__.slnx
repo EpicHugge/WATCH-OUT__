@@ -1,4 +1,11 @@
 ﻿<Solution>
+<<<<<<< Updated upstream
   <Project Path="Assembly-CSharp-Editor.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
+=======
+  <Project Path="RadicalForge.Blockout.csproj" />
+  <Project Path="RadicalForge.Blockout.Editor.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="Assembly-CSharp-Editor.csproj" />
+>>>>>>> Stashed changes
 </Solution>
