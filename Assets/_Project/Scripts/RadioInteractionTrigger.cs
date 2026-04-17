@@ -8,7 +8,7 @@ namespace WatchOut
     public class RadioInteractionTrigger : MonoBehaviour
     {
         [SerializeField] private RadioSystem radioSystem;
-        [SerializeField] public bool isIncreaseButton;
+        [SerializeField] private bool isIncreaseButton;
 
         /// <summary>
         /// Call this method from your Interaction System when the button is pressed/clicked.
