@@ -4,16 +4,17 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class InteractionOutlineHighlight : MonoBehaviour
 {
+    private const uint HoverRenderingLayerMask = 1u << 1;
+
     [Tooltip("Optional manual renderer list. Leaving this empty outlines all child renderers. For noisy multipart props, assign only the renderers that best represent the object's readable outer form.")]
     [SerializeField] private Renderer[] sourceRenderers;
     [Tooltip("When source renderers are not assigned manually, this controls whether disabled child renderers are included in auto-discovery.")]
     [SerializeField] private bool includeInactiveChildren = true;
-    [SerializeField] private Color outlineColor = Color.white;
 
     private bool isHighlighted;
+    private readonly List<RendererState> highlightedRenderers = new List<RendererState>();
 
     public IReadOnlyList<Renderer> SourceRenderers => sourceRenderers;
-    public Color OutlineColor => outlineColor;
 
     private void Awake()
     {
@@ -24,18 +25,18 @@ public sealed class InteractionOutlineHighlight : MonoBehaviour
     {
         if (isHighlighted)
         {
-            InteractionOutlineRegistry.Register(this);
+            ApplyHighlight();
         }
     }
 
     private void OnDisable()
     {
-        InteractionOutlineRegistry.Unregister(this);
+        RestoreOriginalRenderingLayers();
     }
 
     private void OnDestroy()
     {
-        InteractionOutlineRegistry.Unregister(this);
+        RestoreOriginalRenderingLayers();
     }
 
     public void SetHighlighted(bool highlighted)
@@ -46,19 +47,74 @@ public sealed class InteractionOutlineHighlight : MonoBehaviour
         }
 
         isHighlighted = highlighted;
-        RefreshSourceRenderers();
 
         if (isHighlighted && isActiveAndEnabled)
         {
-            InteractionOutlineRegistry.Register(this);
+            ApplyHighlight();
         }
         else
         {
-            InteractionOutlineRegistry.Unregister(this);
+            RestoreOriginalRenderingLayers();
         }
     }
 
     public void RefreshSourceRenderers()
+    {
+        bool reapplyHighlight = isHighlighted && isActiveAndEnabled;
+        if (reapplyHighlight)
+        {
+            RestoreOriginalRenderingLayers();
+        }
+
+        RebuildSourceRenderers();
+
+        if (reapplyHighlight)
+        {
+            ApplyHighlight();
+        }
+    }
+
+    private void ApplyHighlight()
+    {
+        RefreshSourceRenderersIfNeeded();
+        RestoreOriginalRenderingLayers();
+
+        for (int i = 0; i < sourceRenderers.Length; i++)
+        {
+            Renderer sourceRenderer = sourceRenderers[i];
+            if (sourceRenderer == null)
+            {
+                continue;
+            }
+
+            highlightedRenderers.Add(new RendererState(sourceRenderer, sourceRenderer.renderingLayerMask));
+            sourceRenderer.renderingLayerMask |= HoverRenderingLayerMask;
+        }
+    }
+
+    private void RestoreOriginalRenderingLayers()
+    {
+        for (int i = 0; i < highlightedRenderers.Count; i++)
+        {
+            RendererState rendererState = highlightedRenderers[i];
+            if (rendererState.Renderer != null)
+            {
+                rendererState.Renderer.renderingLayerMask = rendererState.OriginalRenderingLayerMask;
+            }
+        }
+
+        highlightedRenderers.Clear();
+    }
+
+    private void RefreshSourceRenderersIfNeeded()
+    {
+        if (sourceRenderers == null || sourceRenderers.Length == 0)
+        {
+            RebuildSourceRenderers();
+        }
+    }
+
+    private void RebuildSourceRenderers()
     {
         if (sourceRenderers == null || sourceRenderers.Length == 0)
         {
@@ -74,11 +130,15 @@ public sealed class InteractionOutlineHighlight : MonoBehaviour
         }
 
         List<Renderer> filteredRenderers = new List<Renderer>(sourceRenderers.Length);
+        HashSet<Renderer> seenRenderers = new HashSet<Renderer>();
 
         for (int i = 0; i < sourceRenderers.Length; i++)
         {
             Renderer sourceRenderer = sourceRenderers[i];
-            if (sourceRenderer == null || sourceRenderer is ParticleSystemRenderer || sourceRenderer is TrailRenderer)
+            if (sourceRenderer == null ||
+                sourceRenderer is ParticleSystemRenderer ||
+                sourceRenderer is TrailRenderer ||
+                !seenRenderers.Add(sourceRenderer))
             {
                 continue;
             }
@@ -95,4 +155,16 @@ public sealed class InteractionOutlineHighlight : MonoBehaviour
         RefreshSourceRenderers();
     }
 #endif
+
+    private readonly struct RendererState
+    {
+        public RendererState(Renderer renderer, uint originalRenderingLayerMask)
+        {
+            Renderer = renderer;
+            OriginalRenderingLayerMask = originalRenderingLayerMask;
+        }
+
+        public Renderer Renderer { get; }
+        public uint OriginalRenderingLayerMask { get; }
+    }
 }

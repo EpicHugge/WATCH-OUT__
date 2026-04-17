@@ -71,6 +71,11 @@ public sealed class FirstPersonPlayerController : MonoBehaviour
             gameObject.AddComponent<PlayerInteractionController>();
         }
 
+        if (GetComponent<DialogueRunner>() == null)
+        {
+            gameObject.AddComponent<DialogueRunner>();
+        }
+
         ApplyLegacyTuningIfNeeded();
         EnsureCrosshair();
         currentYaw = transform.eulerAngles.y;
