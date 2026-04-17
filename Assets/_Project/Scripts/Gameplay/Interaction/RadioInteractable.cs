@@ -29,13 +29,28 @@ public sealed class RadioInteractable : InteractableBase
 
         if (isIncreaseButton)
         {
-            Debug.Log("Increasing Frequency Button Pressed!");
-            radioSystem.IncreaseFrequency();
+            radioSystem.SetIncreasing(true);
         }
         else
         {
-            Debug.Log("Decreasing Frequency Button Pressed!");
-            radioSystem.DecreaseFrequency();
+            radioSystem.SetDecreasing(true);
+        }
+    }
+
+    protected override void EndInteractInternal(PlayerInteractionController interactor)
+    {
+        if (radioSystem == null)
+        {
+            return;
+        }
+
+        if (isIncreaseButton)
+        {
+            radioSystem.SetIncreasing(false);
+        }
+        else
+        {
+            radioSystem.SetDecreasing(false);
         }
     }
 }
