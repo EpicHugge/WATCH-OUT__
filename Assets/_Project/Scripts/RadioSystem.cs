@@ -14,7 +14,7 @@ namespace WatchOut
         [SerializeField] private float holdDelay = 0.5f;
 
         [Header("UI References")]
-        [SerializeField] private TextMeshProUGUI frequencyDisplayText;
+        [SerializeField] private TMP_Text frequencyDisplayText;
 
         private float _currentFrequency;
         private bool _isIncreasing;
