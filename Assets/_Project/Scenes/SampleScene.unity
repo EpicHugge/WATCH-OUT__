@@ -508,8 +508,6 @@ MonoBehaviour:
   interactionVerb: Interact
   interactionDisplayName: 
   lockedPrompt: Locked
-  autoCreateHighlight: 1
-  interactionHighlight: {fileID: 0}
   onLockedInteract:
     m_PersistentCalls:
       m_Calls: []
@@ -901,8 +899,6 @@ MonoBehaviour:
   interactionVerb: Interact
   interactionDisplayName: 
   lockedPrompt: Locked
-  autoCreateHighlight: 1
-  interactionHighlight: {fileID: 0}
   onLockedInteract:
     m_PersistentCalls:
       m_Calls: []

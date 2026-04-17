@@ -1,6 +1,8 @@
 ﻿<Solution>
+  <Project Path="RadicalForge.Blockout.csproj" />
   <Project Path="LineworkLite.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="RadicalForge.Blockout.Editor.csproj" />
   <Project Path="LineworkLite.Editor.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
 </Solution>

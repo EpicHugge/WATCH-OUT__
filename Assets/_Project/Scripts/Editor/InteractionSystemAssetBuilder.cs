@@ -143,6 +143,7 @@ public static class InteractionSystemAssetBuilder
             return;
         }
 
+        RemoveMissingRendererFeatures(rendererData);
         DisableLegacyInteractionFeature(rendererData);
 
         FreeOutline feature = FindFeature<FreeOutline>(rendererData);
@@ -162,9 +163,44 @@ public static class InteractionSystemAssetBuilder
         EditorUtility.SetDirty(rendererData);
     }
 
+    private static void RemoveMissingRendererFeatures(UniversalRendererData rendererData)
+    {
+        SerializedObject serializedRendererData = new SerializedObject(rendererData);
+        SerializedProperty rendererFeaturesProperty = serializedRendererData.FindProperty("m_RendererFeatures");
+        bool removedMissingFeature = false;
+
+        if (rendererFeaturesProperty != null)
+        {
+            for (int i = rendererFeaturesProperty.arraySize - 1; i >= 0; i--)
+            {
+                SerializedProperty featureProperty = rendererFeaturesProperty.GetArrayElementAtIndex(i);
+                if (featureProperty.objectReferenceValue != null)
+                {
+                    continue;
+                }
+
+                rendererFeaturesProperty.DeleteArrayElementAtIndex(i);
+                removedMissingFeature = true;
+            }
+        }
+
+        if (!removedMissingFeature)
+        {
+            return;
+        }
+
+        SerializedProperty rendererFeatureMapProperty = serializedRendererData.FindProperty("m_RendererFeatureMap");
+        if (rendererFeatureMapProperty != null)
+        {
+            rendererFeatureMapProperty.ClearArray();
+        }
+
+        serializedRendererData.ApplyModifiedPropertiesWithoutUndo();
+    }
+
     private static void DisableLegacyInteractionFeature(UniversalRendererData rendererData)
     {
-        InteractionSilhouetteOutlineFeature legacyFeature = FindFeature<InteractionSilhouetteOutlineFeature>(rendererData);
+        ScriptableRendererFeature legacyFeature = FindLegacyInteractionFeature(rendererData);
         if (legacyFeature == null)
         {
             return;
@@ -173,6 +209,25 @@ public static class InteractionSystemAssetBuilder
         legacyFeature.SetActive(false);
         EditorUtility.SetDirty(legacyFeature);
         EditorUtility.SetDirty(rendererData);
+    }
+
+    private static ScriptableRendererFeature FindLegacyInteractionFeature(UniversalRendererData rendererData)
+    {
+        for (int i = 0; i < rendererData.rendererFeatures.Count; i++)
+        {
+            ScriptableRendererFeature feature = rendererData.rendererFeatures[i];
+            if (feature == null)
+            {
+                continue;
+            }
+
+            if (feature.name == "InteractionSilhouetteOutline" || feature.GetType().Name == "InteractionSilhouetteOutlineFeature")
+            {
+                return feature;
+            }
+        }
+
+        return null;
     }
 
     private static TFeature FindFeature<TFeature>(UniversalRendererData rendererData) where TFeature : ScriptableRendererFeature

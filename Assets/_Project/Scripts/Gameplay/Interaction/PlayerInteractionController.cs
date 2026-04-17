@@ -20,6 +20,7 @@ public sealed class PlayerInteractionController : MonoBehaviour
     private InteractableBase currentTarget;
     private RaycastHit currentTargetHit;
     private string currentPrompt = string.Empty;
+    private InteractionOutlineHighlight currentTargetHighlight;
 
     public IInteractable CurrentTarget => currentTarget;
     public RaycastHit CurrentTargetHit => currentTargetHit;
@@ -144,9 +145,20 @@ public sealed class PlayerInteractionController : MonoBehaviour
             return;
         }
 
+        if (targetChanged)
+        {
+            SetTargetHighlight(currentTarget, currentTargetHighlight, false);
+        }
+
         currentTarget = nextTarget;
         currentTargetHit = nextHit;
         currentPrompt = nextPrompt;
+        currentTargetHighlight = currentTarget != null ? ResolveHighlight(currentTarget) : null;
+
+        if (targetChanged)
+        {
+            SetTargetHighlight(currentTarget, currentTargetHighlight, true);
+        }
 
         if (interactionUI != null)
         {
@@ -167,6 +179,32 @@ public sealed class PlayerInteractionController : MonoBehaviour
     private string FormatPrompt(string prompt)
     {
         return $"[{interactKey}] {prompt}";
+    }
+
+    private static InteractionOutlineHighlight ResolveHighlight(InteractableBase interactable)
+    {
+        if (interactable == null)
+        {
+            return null;
+        }
+
+        InteractionOutlineHighlight highlight = interactable.GetComponent<InteractionOutlineHighlight>();
+        if (highlight == null)
+        {
+            highlight = interactable.gameObject.AddComponent<InteractionOutlineHighlight>();
+        }
+
+        return highlight;
+    }
+
+    private static void SetTargetHighlight(InteractableBase interactable, InteractionOutlineHighlight highlight, bool highlighted)
+    {
+        if (interactable == null || highlight == null)
+        {
+            return;
+        }
+
+        highlight.SetHighlighted(highlighted);
     }
 
     private static bool TryGetInteractable(Collider hitCollider, out InteractableBase interactable)
