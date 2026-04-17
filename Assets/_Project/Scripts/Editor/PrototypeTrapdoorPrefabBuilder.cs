@@ -59,14 +59,12 @@ public static class PrototypeTrapdoorPrefabBuilder
             }
 
             DoorInteractable doorInteractable = root.AddComponent<DoorInteractable>();
-
             SetFieldValue(doorInteractable, "doorPivot", pivot.transform);
             SetFieldValue(doorInteractable, "openLocalEulerAngles", new Vector3(115f, 0f, 0f));
             SetFieldValue(doorInteractable, "openSpeed", 3.25f);
             SetFieldValue(doorInteractable, "startsOpen", false);
             SetFieldValue(doorInteractable, "openPrompt", "Open Trapdoor");
             SetFieldValue(doorInteractable, "closePrompt", "Close Trapdoor");
-
             PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
             Debug.Log($"Built prototype trapdoor prefab at {PrefabPath}.");
         }

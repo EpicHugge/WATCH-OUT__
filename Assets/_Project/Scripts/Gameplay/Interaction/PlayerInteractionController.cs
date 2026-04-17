@@ -144,19 +144,9 @@ public sealed class PlayerInteractionController : MonoBehaviour
             return;
         }
 
-        if (targetChanged && currentTarget != null)
-        {
-            currentTarget.SetHighlighted(false);
-        }
-
         currentTarget = nextTarget;
         currentTargetHit = nextHit;
         currentPrompt = nextPrompt;
-
-        if (targetChanged && currentTarget != null)
-        {
-            currentTarget.SetHighlighted(true);
-        }
 
         if (interactionUI != null)
         {
