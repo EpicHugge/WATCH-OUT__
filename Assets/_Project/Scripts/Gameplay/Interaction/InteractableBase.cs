@@ -12,8 +12,6 @@ public abstract class InteractableBase : MonoBehaviour, IInteractable
     [SerializeField] private string lockedPrompt = "Locked";
 
     [Header("Feedback")]
-    [SerializeField] private bool autoCreateHighlight = true;
-    [SerializeField] private InteractionOutlineHighlight interactionHighlight;
     [SerializeField] private UnityEvent onLockedInteract;
 
     private bool isLocked;
@@ -24,16 +22,6 @@ public abstract class InteractableBase : MonoBehaviour, IInteractable
     protected virtual void Awake()
     {
         isLocked = startsLocked;
-
-        if (autoCreateHighlight && interactionHighlight == null)
-        {
-            interactionHighlight = GetComponent<InteractionOutlineHighlight>();
-
-            if (interactionHighlight == null)
-            {
-                interactionHighlight = gameObject.AddComponent<InteractionOutlineHighlight>();
-            }
-        }
     }
 
     public virtual bool CanInteract(PlayerInteractionController interactor)
@@ -73,22 +61,9 @@ public abstract class InteractableBase : MonoBehaviour, IInteractable
         InteractInternal(interactor);
     }
 
-    public virtual void SetHighlighted(bool isHighlighted)
-    {
-        if (interactionHighlight != null)
-        {
-            interactionHighlight.SetHighlighted(isHighlighted);
-        }
-    }
-
     public void SetInteractionEnabled(bool isEnabled)
     {
         interactionEnabled = isEnabled;
-
-        if (!interactionEnabled)
-        {
-            SetHighlighted(false);
-        }
     }
 
     public void SetLocked(bool locked)
