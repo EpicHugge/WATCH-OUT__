@@ -1,4 +1,5 @@
 using System.Collections;
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -30,6 +31,9 @@ public sealed class SleepController : MonoBehaviour
     private bool restoreCharacterControllerEnabled;
 
     public bool IsSequenceRunning => activeSequence != null;
+    public event Action SleepSequenceStarted;
+    public event Action DayAdvanced;
+    public event Action SleepSequenceFinished;
 
     public bool TryStartSleepSequence(SleepBedInteractable bed)
     {
@@ -41,6 +45,7 @@ public sealed class SleepController : MonoBehaviour
         EnsureReferences();
         activeBed = bed;
         activeSequence = StartCoroutine(SleepSequenceRoutine(bed));
+        SleepSequenceStarted?.Invoke();
         return true;
     }
 
@@ -94,6 +99,7 @@ public sealed class SleepController : MonoBehaviour
         SleepBedInteractable completedBed = activeBed;
         activeBed = null;
         activeSequence = null;
+        SleepSequenceFinished?.Invoke();
         completedBed?.NotifySleepSequenceFinished();
     }
 
@@ -281,5 +287,6 @@ public sealed class SleepController : MonoBehaviour
     private void AdvanceDay()
     {
         onAdvanceDay?.Invoke();
+        DayAdvanced?.Invoke();
     }
 }
