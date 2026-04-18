@@ -13,8 +13,7 @@ MonoBehaviour:
   m_Name: DAY_001
   m_EditorClassIdentifier: Assembly-CSharp::DayData
   dayNumber: 1
-  availableCassettes:
-  - {fileID: 11400000, guid: 39d0dd52ecf24bb3ba7b78f81ebf5cf8, type: 2}
+  availableCassettes: []
   availableRadioEvents:
   - {fileID: 11400000, guid: 3f17a45bd6d145bab0bf7e0261ef8a53, type: 2}
   dayStartDialogue: {fileID: 0}

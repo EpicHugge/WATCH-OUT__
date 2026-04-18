@@ -24,6 +24,9 @@ public sealed class ProgressionManager : MonoBehaviour
     [SerializeField] [Min(0.001f)] private float frequencyMatchTolerance = 0.05f;
 
     [Header("Debug")]
+    [SerializeField] private bool allowRadioDebugWithoutCassette = true;
+    [SerializeField] private bool repeatSameRadioLoopEveryNightInTestBuild = true;
+    [SerializeField] private bool powerDownGeneratorAndRadioAfterDialogueInTestBuild = true;
     [SerializeField] [Min(1)] private int debugSetDay = 1;
     [SerializeField] private DayPhase debugSetPhase = DayPhase.NeedGenerator;
     [SerializeField] private CassetteData debugTestCassette;
@@ -52,6 +55,9 @@ public sealed class ProgressionManager : MonoBehaviour
     public IReadOnlyList<RadioEventData> ActiveRadioEventsToday => activeRadioEventsToday;
     public IReadOnlyList<RadioEventData> ResolvedRadioEventsToday => resolvedRadioEventsToday;
     public IReadOnlyList<RadioEventData> CompletedOneTimeRadioEvents => completedOneTimeRadioEvents;
+    public bool RepeatSameRadioLoopEveryNightInTestBuild => repeatSameRadioLoopEveryNightInTestBuild;
+    public bool PowerDownGeneratorAndRadioAfterDialogueInTestBuild => powerDownGeneratorAndRadioAfterDialogueInTestBuild;
+    public bool DeferPowerOutUntilDialogueEndsInTestBuild => powerDownGeneratorAndRadioAfterDialogueInTestBuild;
     public int DebugSetDay { get => debugSetDay; set => debugSetDay = Mathf.Max(1, value); }
     public DayPhase DebugSetPhase { get => debugSetPhase; set => debugSetPhase = value; }
     public CassetteData DebugTestCassette { get => debugTestCassette; set => debugTestCassette = value; }
@@ -84,6 +90,11 @@ public sealed class ProgressionManager : MonoBehaviour
             return;
         }
 
+        if (DeferPowerOutUntilDialogueEndsInTestBuild)
+        {
+            return;
+        }
+
         if (powerOutMode != PowerOutMode.TimeBased)
         {
             return;
@@ -108,6 +119,11 @@ public sealed class ProgressionManager : MonoBehaviour
         radioScanElapsedSeconds = 0f;
         activeRadioEventsToday.Clear();
         resolvedRadioEventsToday.Clear();
+
+        if (repeatSameRadioLoopEveryNightInTestBuild)
+        {
+            completedOneTimeRadioEvents.Clear();
+        }
 
         SetPhaseInternal(DayPhase.WakingUp);
 
@@ -171,13 +187,18 @@ public sealed class ProgressionManager : MonoBehaviour
 
     public bool BeginRadioScan()
     {
+        if (currentPhase == DayPhase.ScanningRadio)
+        {
+            return true;
+        }
+
         if (!generatorStartedToday)
         {
             Debug.LogWarning("Radio scan cannot begin before the generator has started.", this);
             return false;
         }
 
-        if (selectedCassetteToday == null)
+        if (selectedCassetteToday == null && !allowRadioDebugWithoutCassette)
         {
             Debug.LogWarning("Radio scan cannot begin before a cassette has been selected.", this);
             return false;
@@ -190,32 +211,72 @@ public sealed class ProgressionManager : MonoBehaviour
         return true;
     }
 
+    public bool EnsureRadioScanActive()
+    {
+        if (powerOutTriggeredToday)
+        {
+            return false;
+        }
+
+        return currentPhase == DayPhase.ScanningRadio || BeginRadioScan();
+    }
+
     public bool TryGetMatchingRadioEvent(float tunedFrequency, out RadioEventData matchingEvent)
     {
-        RefreshActiveRadioEvents();
-
-        for (int i = 0; i < activeRadioEventsToday.Count; i++)
+        if (TryGetClosestRadioEvent(tunedFrequency, false, out RadioEventData closestEvent, out float closestDistance) &&
+            closestDistance <= frequencyMatchTolerance)
         {
-            RadioEventData candidate = activeRadioEventsToday[i];
-            if (candidate == null)
-            {
-                continue;
-            }
-
-            if (Mathf.Abs(candidate.TargetFrequency - tunedFrequency) <= frequencyMatchTolerance)
-            {
-                matchingEvent = candidate;
-                return true;
-            }
+            matchingEvent = closestEvent;
+            return true;
         }
 
         matchingEvent = null;
         return false;
     }
 
+    public bool TryGetClosestRadioEvent(
+        float tunedFrequency,
+        bool includeResolvedToday,
+        out RadioEventData closestEvent,
+        out float closestDistance)
+    {
+        closestEvent = null;
+        closestDistance = float.MaxValue;
+
+        DayData dayData = CurrentDayData;
+        if (dayData == null || (!allowRadioDebugWithoutCassette && selectedCassetteToday == null))
+        {
+            return false;
+        }
+
+        IReadOnlyList<RadioEventData> candidateEvents = dayData.AvailableRadioEvents;
+        for (int i = 0; i < candidateEvents.Count; i++)
+        {
+            RadioEventData radioEvent = candidateEvents[i];
+            if (!IsRadioEventAvailableForCurrentState(radioEvent, includeResolvedToday))
+            {
+                continue;
+            }
+
+            float distance = Mathf.Abs(radioEvent.TargetFrequency - tunedFrequency);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestEvent = radioEvent;
+            }
+        }
+
+        return closestEvent != null;
+    }
+
     public bool MarkRadioEventFound(RadioEventData radioEvent)
     {
         if (radioEvent == null)
+        {
+            return false;
+        }
+
+        if (resolvedRadioEventsToday.Contains(radioEvent))
         {
             return false;
         }
@@ -229,11 +290,6 @@ public sealed class ProgressionManager : MonoBehaviour
             return false;
         }
 
-        if (resolvedRadioEventsToday.Contains(radioEvent))
-        {
-            return false;
-        }
-
         resolvedRadioEventsToday.Add(radioEvent);
 
         if (radioEvent.OneTimeOnly && !completedOneTimeRadioEvents.Contains(radioEvent))
@@ -243,6 +299,7 @@ public sealed class ProgressionManager : MonoBehaviour
 
         RefreshActiveRadioEvents();
         EvaluatePowerOutCondition();
+
         NotifyStateChanged();
         return true;
     }
@@ -272,9 +329,17 @@ public sealed class ProgressionManager : MonoBehaviour
         NotifyStateChanged();
     }
 
+    public void CompleteDebugRadioLoopAfterDialogue()
+    {
+        TriggerPowerOut();
+        EndDay();
+    }
+
     public void AdvanceToNextDay()
     {
-        currentDay = Mathf.Max(1, currentDay + 1);
+        currentDay = repeatSameRadioLoopEveryNightInTestBuild
+            ? Mathf.Max(1, startingDay)
+            : Mathf.Max(1, currentDay + 1);
         StartDay();
     }
 
@@ -376,7 +441,7 @@ public sealed class ProgressionManager : MonoBehaviour
         activeRadioEventsToday.Clear();
 
         DayData dayData = CurrentDayData;
-        if (dayData == null || selectedCassetteToday == null)
+        if (dayData == null || (!allowRadioDebugWithoutCassette && selectedCassetteToday == null))
         {
             return;
         }
@@ -385,7 +450,7 @@ public sealed class ProgressionManager : MonoBehaviour
         for (int i = 0; i < candidateEvents.Count; i++)
         {
             RadioEventData radioEvent = candidateEvents[i];
-            if (!IsEventActiveForToday(radioEvent))
+            if (!IsRadioEventAvailableForCurrentState(radioEvent, false))
             {
                 continue;
             }
@@ -394,19 +459,23 @@ public sealed class ProgressionManager : MonoBehaviour
         }
     }
 
-    private bool IsEventActiveForToday(RadioEventData radioEvent)
+    private bool IsRadioEventAvailableForCurrentState(RadioEventData radioEvent, bool includeResolvedToday)
     {
         if (radioEvent == null)
         {
             return false;
         }
 
-        if (resolvedRadioEventsToday.Contains(radioEvent))
+        bool isResolvedToday = resolvedRadioEventsToday.Contains(radioEvent);
+        if (!includeResolvedToday && isResolvedToday)
         {
             return false;
         }
 
-        if (radioEvent.OneTimeOnly && completedOneTimeRadioEvents.Contains(radioEvent))
+        if (!repeatSameRadioLoopEveryNightInTestBuild &&
+            radioEvent.OneTimeOnly &&
+            completedOneTimeRadioEvents.Contains(radioEvent) &&
+            !isResolvedToday)
         {
             return false;
         }
@@ -414,6 +483,11 @@ public sealed class ProgressionManager : MonoBehaviour
         if (!radioEvent.IsAvailableOnDay(currentDay))
         {
             return false;
+        }
+
+        if (selectedCassetteToday == null)
+        {
+            return allowRadioDebugWithoutCassette;
         }
 
         return radioEvent.AllowsCassette(selectedCassetteToday);
@@ -438,6 +512,11 @@ public sealed class ProgressionManager : MonoBehaviour
     private void EvaluatePowerOutCondition()
     {
         if (powerOutTriggeredToday)
+        {
+            return;
+        }
+
+        if (DeferPowerOutUntilDialogueEndsInTestBuild)
         {
             return;
         }

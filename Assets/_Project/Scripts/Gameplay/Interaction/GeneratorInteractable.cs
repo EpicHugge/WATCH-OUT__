@@ -64,7 +64,17 @@ public sealed class GeneratorInteractable : InteractableBase
 
     protected override void InteractInternal(PlayerInteractionController interactor)
     {
-        isOn = !isOn;
+        SetPowerState(!isOn);
+    }
+
+    public bool SetPowerState(bool value)
+    {
+        if (isOn == value)
+        {
+            return false;
+        }
+
+        isOn = value;
         ApplyVisualState();
 
         if (isOn)
@@ -79,6 +89,7 @@ public sealed class GeneratorInteractable : InteractableBase
         }
 
         StateChanged?.Invoke(isOn);
+        return true;
     }
 
     private void ApplyVisualState()
