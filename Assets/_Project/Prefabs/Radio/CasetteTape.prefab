@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3520990801836921005}
   - component: {fileID: 399152049366362133}
   - component: {fileID: 5318600072560130618}
+  - component: {fileID: 4173517666909797129}
   m_Layer: 3
   m_Name: CasetteTape
   m_TagString: Untagged
@@ -78,10 +79,42 @@ MonoBehaviour:
   objectToMove: {fileID: 149814314267526337}
   hoverOffset: {x: 0, y: 0.01, z: -0.2}
   moveSpeed: 10
-  prompt: Interact
+  prompt: Pick Cassette
   onInteract:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 4173517666909797129}
+        m_TargetAssemblyTypeName: CassetteShelfSlot, Assembly-CSharp
+        m_MethodName: HandleInteract
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &4173517666909797129
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7929567495511250229}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2223caabc5ed7c2409fc4636eca49f70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CassetteShelfSlot
+  slotMode: 0
+  cassetteData: {fileID: 0}
+  cassettePlayerReceiver: {fileID: 0}
+  hoverInteractable: {fileID: 5318600072560130618}
+  interactionCollider: {fileID: 399152049366362133}
+  visualToHide: {fileID: 7929567495511250229}
+  functionalPrompt: Pick Cassette
+  workInProgressPrompt: WIP
 --- !u!1 &7933742265201951768
 GameObject:
   m_ObjectHideFlags: 0

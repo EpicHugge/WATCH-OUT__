@@ -16,6 +16,8 @@ public sealed class HoverMoveInteractable : InteractableBase
     private Vector3 originalPosition;
     private bool isHovered;
 
+    public UnityEvent OnInteractEvent => onInteract;
+
     protected override void Awake()
     {
         base.Awake();
@@ -50,6 +52,11 @@ public sealed class HoverMoveInteractable : InteractableBase
     {
         if (IsLocked) return base.GetInteractionPrompt(interactor);
         return prompt;
+    }
+
+    public void SetPrompt(string value)
+    {
+        prompt = string.IsNullOrWhiteSpace(value) ? "Interact" : value;
     }
 
     protected override void InteractInternal(PlayerInteractionController interactor)

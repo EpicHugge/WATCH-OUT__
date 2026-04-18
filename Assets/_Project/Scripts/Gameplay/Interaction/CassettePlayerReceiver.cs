@@ -8,9 +8,8 @@ public sealed class CassettePlayerReceiver : MonoBehaviour
     [SerializeField] private DialogueRunner dialogueRunner;
     [SerializeField] private GameObject loadedCassetteVisual;
 
-    [Header("Playback")]
+    [Header("Selection")]
     [SerializeField] private bool replaceLoadedCassette = true;
-    [SerializeField] private bool playBroadcastConversationOnLoad = true;
 
     private CassetteData loadedCassette;
 
@@ -23,7 +22,7 @@ public sealed class CassettePlayerReceiver : MonoBehaviour
         RefreshVisualState();
     }
 
-    public bool TryLoadCassette(CassetteData cassette)
+    public bool TrySelectCassette(CassetteData cassette)
     {
         if (cassette == null)
         {
@@ -43,14 +42,34 @@ public sealed class CassettePlayerReceiver : MonoBehaviour
         }
 
         loadedCassette = cassette;
-        progressionManager?.MarkCassettePlaybackStarted(cassette);
         RefreshVisualState();
+        return true;
+    }
 
-        if (playBroadcastConversationOnLoad && cassette.BroadcastConversation != null && dialogueRunner != null)
+    public bool TryPlayLoadedCassette()
+    {
+        if (loadedCassette == null)
         {
-            dialogueRunner.StartConversation(cassette.BroadcastConversation);
+            return false;
         }
 
+        ResolveReferences();
+
+        if (loadedCassette.BroadcastConversation != null)
+        {
+            if (dialogueRunner == null)
+            {
+                Debug.LogWarning("CassettePlayerReceiver could not find a DialogueRunner to play the loaded cassette.", this);
+                return false;
+            }
+
+            if (!dialogueRunner.StartConversation(loadedCassette.BroadcastConversation))
+            {
+                return false;
+            }
+        }
+
+        progressionManager?.MarkCassettePlaybackStarted(loadedCassette);
         return true;
     }
 

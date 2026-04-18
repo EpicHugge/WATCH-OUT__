@@ -193,6 +193,7 @@ namespace WatchOut
             {
                 float signalStrength = 1f - (closestDistance / proximityRange);
                 float nearSignalMultiplier = isDialogueRunning ? dialogueAudioDuckMultiplier : 1f;
+                SyncNearSignalLoopPlayback(nearSignalAudioSource != null && nearSignalAudioSource.clip != null);
                 
                 if (staticAudioSource != null)
                 {
@@ -390,6 +391,7 @@ namespace WatchOut
 
             if (nearSignalAudioSource != null)
             {
+                SyncNearSignalLoopPlayback(false);
                 nearSignalAudioSource.volume = 0f;
             }
 
@@ -441,12 +443,38 @@ namespace WatchOut
                 generatorInteractable = FindAnyObjectByType<GeneratorInteractable>();
             }
 
+            if (frequencyDisplayText == null)
+            {
+                frequencyDisplayText = FindFrequencyDisplayText();
+            }
+
+            if (poweredScreenRenderer == null)
+            {
+                poweredScreenRenderer = FindPoweredScreenRenderer();
+            }
+
+            if (staticAudioSource == null)
+            {
+                staticAudioSource = FindAudioSource("Audio Static");
+            }
+
+            if (nearSignalAudioSource == null)
+            {
+                nearSignalAudioSource = FindAudioSource("Audio Near Signal");
+            }
+
+            if (exactLockAudioSource == null)
+            {
+                exactLockAudioSource = FindAudioSource("Audio Lock Cue");
+            }
+
             if (poweredScreenRenderer == null && frequencyDisplayText != null)
             {
-                Transform screenTransform = frequencyDisplayText.transform.parent;
-                if (screenTransform != null)
+                Transform current = frequencyDisplayText.transform.parent;
+                while (current != null && poweredScreenRenderer == null)
                 {
-                    poweredScreenRenderer = screenTransform.GetComponent<Renderer>();
+                    poweredScreenRenderer = current.GetComponent<Renderer>();
+                    current = current.parent;
                 }
             }
         }
@@ -535,14 +563,8 @@ namespace WatchOut
             {
                 nearSignalAudioSource.Stop();
                 nearSignalAudioSource.clip = clip;
+                nearSignalAudioSource.volume = 0f;
             }
-
-            if (clip != null && !nearSignalAudioSource.isPlaying)
-            {
-                nearSignalAudioSource.Play();
-            }
-
-            nearSignalAudioSource.volume = 0f;
         }
 
         private void TriggerHiddenTestSignalLock(float lockTolerance)
@@ -662,6 +684,90 @@ namespace WatchOut
             if (!staticAudioSource.isPlaying)
             {
                 staticAudioSource.Play();
+            }
+        }
+
+        private TMP_Text FindFrequencyDisplayText()
+        {
+            TMP_Text[] texts = FindObjectsByType<TMP_Text>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            TMP_Text fallback = null;
+
+            for (int i = 0; i < texts.Length; i++)
+            {
+                TMP_Text candidate = texts[i];
+                if (candidate == null)
+                {
+                    continue;
+                }
+
+                if (string.Equals(candidate.gameObject.name, "FrequencyDisplay", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    return candidate;
+                }
+
+                if (fallback == null &&
+                    candidate.transform.parent != null &&
+                    string.Equals(candidate.transform.parent.gameObject.name, "Screen", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    fallback = candidate;
+                }
+            }
+
+            return fallback;
+        }
+
+        private Renderer FindPoweredScreenRenderer()
+        {
+            Renderer[] renderers = FindObjectsByType<Renderer>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            for (int i = 0; i < renderers.Length; i++)
+            {
+                Renderer candidate = renderers[i];
+                if (candidate != null &&
+                    string.Equals(candidate.gameObject.name, "Screen", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    return candidate;
+                }
+            }
+
+            return null;
+        }
+
+        private AudioSource FindAudioSource(string objectName)
+        {
+            AudioSource[] sources = FindObjectsByType<AudioSource>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            for (int i = 0; i < sources.Length; i++)
+            {
+                AudioSource candidate = sources[i];
+                if (candidate != null &&
+                    string.Equals(candidate.gameObject.name, objectName, System.StringComparison.OrdinalIgnoreCase))
+                {
+                    return candidate;
+                }
+            }
+
+            return null;
+        }
+
+        private void SyncNearSignalLoopPlayback(bool shouldPlay)
+        {
+            if (nearSignalAudioSource == null)
+            {
+                return;
+            }
+
+            if (!shouldPlay || nearSignalAudioSource.clip == null)
+            {
+                if (nearSignalAudioSource.isPlaying)
+                {
+                    nearSignalAudioSource.Stop();
+                }
+
+                return;
+            }
+
+            if (!nearSignalAudioSource.isPlaying)
+            {
+                nearSignalAudioSource.Play();
             }
         }
     }

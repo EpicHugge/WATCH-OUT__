@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dff16ec057fa46547bab6b69ce347937, type: 3}
+  m_Name: CONV_NoCassetteLoaded
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueConversation
+  overrideRevealSpeed: 0
+  charactersPerSecond: 60
+  defaultVoiceProfile: {fileID: 0}
+  speakerVoices: []
+  lines:
+  - speakerPreset: {fileID: 0}
+    speakerName: Cassette Player
+    dialogueText: No cassette loaded.
+    overrideTextEffect: 0
+    textEffect: 0
+    overrideSpeakerNameColor: 0
+    speakerNameColor: {r: 0, g: 0, b: 0, a: 0}
+    overrideDialogueTextColor: 0
+    dialogueTextColor: {r: 0, g: 0, b: 0, a: 0}
+    overrideBorderColor: 0
+    borderColor: {r: 0, g: 0, b: 0, a: 0}
+    overrideRevealSpeed: 1
+    charactersPerSecond: 60
+    voiceProfileOverride: {fileID: 0}
+    lineEvent:
+      eventType: 0
+      triggerTiming: 0
+      duration: 0.2
+      magnitude: 0.08
+      frequency: 24
+    autoAdvance: 0
+    autoAdvanceDelay: 0.15
