@@ -768,6 +768,66 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &910000001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 910000002}
+  - component: {fileID: 910000003}
+  m_Layer: 0
+  m_Name: ProgressionManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &910000002
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 910000001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &910000003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 910000001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b1fd479252091241a4c0990d109c2c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProgressionManager
+  days:
+  - {fileID: 11400000, guid: 56c75201429b481aaef9e90462b252f0, type: 2}
+  startingDay: 1
+  autoStartOnPlay: 1
+  completeWakeUpImmediatelyOnSceneStart: 1
+  dialogueRunner: {fileID: 0}
+  playDayStartDialogueAutomatically: 1
+  playDayEndDialogueOnPowerOut: 0
+  powerOutMode: 0
+  radioEventsNeededBeforePowerOut: 1
+  radioScanSecondsBeforePowerOut: 120
+  frequencyMatchTolerance: 0.05
+  debugSetDay: 1
+  debugSetPhase: 0
+  debugTestCassette: {fileID: 11400000, guid: 39d0dd52ecf24bb3ba7b78f81ebf5cf8, type: 2}
+  debugTestFrequency: 94.3
 --- !u!1 &966666849
 GameObject:
   m_ObjectHideFlags: 0
@@ -1074,8 +1134,30 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1000000000000000001, guid: 46b3fe74e9d54d3ca7d35b6d39b8102c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1086935008}
   m_SourcePrefab: {fileID: 100100000, guid: 46b3fe74e9d54d3ca7d35b6d39b8102c, type: 3}
+--- !u!1 &1086935007 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1000000000000000001, guid: 46b3fe74e9d54d3ca7d35b6d39b8102c, type: 3}
+  m_PrefabInstance: {fileID: 1086935006}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1086935008
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1086935007}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba4bed4950e49deba9fb9ad1f811bdf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProgressionGeneratorBridge
+  progressionManager: {fileID: 910000003}
+  generatorInteractable: {fileID: 0}
 --- !u!1 &1147589219
 GameObject:
   m_ObjectHideFlags: 0
@@ -1684,8 +1766,30 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1845872093932976244, guid: a421970b3ad783e4282f306061810f9b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1704582126}
   m_SourcePrefab: {fileID: 100100000, guid: a421970b3ad783e4282f306061810f9b, type: 3}
+--- !u!1 &1704582125 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1845872093932976244, guid: a421970b3ad783e4282f306061810f9b, type: 3}
+  m_PrefabInstance: {fileID: 1704582124}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1704582126
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1704582125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a753b4fb49534cc6bbc3cef99a187216, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProgressionSleepBridge
+  progressionManager: {fileID: 910000003}
+  sleepController: {fileID: 0}
 --- !u!1 &1746520726
 GameObject:
   m_ObjectHideFlags: 0
@@ -2082,8 +2186,43 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1607419250942982055, guid: 40de0645634a9e442a444b8bca854145, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1901002217}
   m_SourcePrefab: {fileID: 100100000, guid: 40de0645634a9e442a444b8bca854145, type: 3}
+--- !u!1 &1901002216 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1607419250942982055, guid: 40de0645634a9e442a444b8bca854145, type: 3}
+  m_PrefabInstance: {fileID: 1901002215}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1901002217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1901002216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d9d2cde23721fc4dba9ca301478d70b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProgressionInteractablePhaseGate
+  progressionManager: {fileID: 910000003}
+  targetInteractable: {fileID: 1901002218}
+  unlockWhenManagerMissing: 1
+  allowedPhases: 0400000005000000
+--- !u!114 &1901002218 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8364074423108407797, guid: 40de0645634a9e442a444b8bca854145, type: 3}
+  m_PrefabInstance: {fileID: 1901002215}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1901002216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf02b98be11293a40a94aa3e7a8a7ff5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SleepBedInteractable
 --- !u!1 &1969649131
 GameObject:
   m_ObjectHideFlags: 0
@@ -2332,3 +2471,4 @@ SceneRoots:
   - {fileID: 1086935006}
   - {fileID: 478025942}
   - {fileID: 1901002215}
+  - {fileID: 910000002}
