@@ -174,6 +174,11 @@ public sealed class PlayerInteractionController : MonoBehaviour
         if (targetChanged)
         {
             SetTargetHighlight(currentTarget, currentTargetHighlight, false);
+
+            if (currentTarget != null)
+            {
+                currentTarget.OnHoverExit(this);
+            }
         }
 
         currentTarget = nextTarget;
@@ -184,6 +189,11 @@ public sealed class PlayerInteractionController : MonoBehaviour
         if (targetChanged)
         {
             SetTargetHighlight(currentTarget, currentTargetHighlight, true);
+
+            if (currentTarget != null)
+            {
+                currentTarget.OnHoverEnter(this);
+            }
         }
 
         if (interactionUI != null)
