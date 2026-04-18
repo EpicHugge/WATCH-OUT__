@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
@@ -15,6 +16,7 @@ public sealed class DialogueRunner : MonoBehaviour
     [SerializeField] private DialogueUI dialogueUI;
     [SerializeField] private DialogueTypewriter typewriter;
     [SerializeField] private DialogueVoicePlayer voicePlayer;
+    [SerializeField] private DialogueCameraShake cameraShake;
 
     [Header("Input")]
     [SerializeField] private Key keyboardAdvanceKey = Key.Space;
@@ -29,6 +31,7 @@ public sealed class DialogueRunner : MonoBehaviour
     private bool restoreInteractionEnabled;
     private bool restorePlayerControllerEnabled;
     private bool waitForAdvanceRelease;
+    private Coroutine autoAdvanceRoutine;
 
     public bool IsRunning => currentConversation != null;
 
@@ -115,6 +118,7 @@ public sealed class DialogueRunner : MonoBehaviour
             return;
         }
 
+        CancelAutoAdvance();
         ShowNextLine();
     }
 
@@ -133,6 +137,7 @@ public sealed class DialogueRunner : MonoBehaviour
         currentConversation = null;
         currentLineIndex = -1;
         waitForAdvanceRelease = false;
+        CancelAutoAdvance();
 
         if (typewriter != null)
         {
@@ -208,6 +213,27 @@ public sealed class DialogueRunner : MonoBehaviour
         {
             voicePlayer = gameObject.AddComponent<DialogueVoicePlayer>();
         }
+
+        if (cameraShake == null)
+        {
+            cameraShake = GetComponent<DialogueCameraShake>();
+        }
+
+        if (cameraShake == null)
+        {
+            cameraShake = gameObject.AddComponent<DialogueCameraShake>();
+        }
+
+        if (cameraShake != null)
+        {
+            Transform shakeTarget = playerController != null ? playerController.CameraPivot : null;
+            if (shakeTarget == null && Camera.main != null)
+            {
+                shakeTarget = Camera.main.transform;
+            }
+
+            cameraShake.SetTarget(shakeTarget);
+        }
     }
 
     private void ShowNextLine()
@@ -218,6 +244,7 @@ public sealed class DialogueRunner : MonoBehaviour
             return;
         }
 
+        CancelAutoAdvance();
         currentLineIndex++;
         if (currentLineIndex >= currentConversation.LineCount)
         {
@@ -226,13 +253,15 @@ public sealed class DialogueRunner : MonoBehaviour
         }
 
         DialogueLine line = currentConversation.Lines[currentLineIndex];
-        dialogueUI.ShowLine(line);
+        DialogueProcessedText processedText = DialogueTextProcessor.Process(line.DialogueText);
+        dialogueUI.ShowLine(line, processedText);
         dialogueUI.SetContinueText(IsShowingLastLine() ? EndConversationPromptText : ContinuePromptText);
 
         float revealSpeed = currentConversation.ResolveCharactersPerSecond(line, charactersPerSecond);
         DialogueVoiceProfile voiceProfile = currentConversation.ResolveVoiceProfile(line);
         voicePlayer.BeginLine(voiceProfile);
-        typewriter.BeginReveal(dialogueUI.BodyText, line.DialogueText, revealSpeed, voicePlayer.ProcessRevealedCharacter, OnLineRevealCompleted);
+        RunLineEvent(line, DialogueLineEventTiming.OnLineStart);
+        typewriter.BeginReveal(dialogueUI.BodyText, processedText, revealSpeed, voicePlayer.ProcessRevealedCharacter, OnLineRevealCompleted);
     }
 
     private void OnLineRevealCompleted()
@@ -242,9 +271,17 @@ public sealed class DialogueRunner : MonoBehaviour
             voicePlayer.StopPlayback();
         }
 
+        DialogueLine currentLine = GetCurrentLine();
+        RunLineEvent(currentLine, DialogueLineEventTiming.OnLineComplete);
+
         if (dialogueUI != null)
         {
-            dialogueUI.SetContinueVisible(true);
+            dialogueUI.SetContinueVisible(currentLine != null && !currentLine.AutoAdvance);
+        }
+
+        if (currentLine != null && currentLine.AutoAdvance)
+        {
+            autoAdvanceRoutine = StartCoroutine(AutoAdvanceAfterDelay(currentLine.AutoAdvanceDelay));
         }
     }
 
@@ -291,5 +328,52 @@ public sealed class DialogueRunner : MonoBehaviour
         }
 
         return Gamepad.current != null && Gamepad.current[gamepadAdvanceButton].isPressed;
+    }
+
+    private DialogueLine GetCurrentLine()
+    {
+        if (currentConversation == null || currentLineIndex < 0 || currentLineIndex >= currentConversation.LineCount)
+        {
+            return null;
+        }
+
+        return currentConversation.Lines[currentLineIndex];
+    }
+
+    private void RunLineEvent(DialogueLine line, DialogueLineEventTiming triggerTiming)
+    {
+        if (line == null || line.LineEvent == null || !line.LineEvent.TriggersAt(triggerTiming))
+        {
+            return;
+        }
+
+        if (line.LineEvent.EventType == DialogueLineEventType.CameraShake && cameraShake != null)
+        {
+            cameraShake.PlayShake(line.LineEvent.Duration, line.LineEvent.Magnitude, line.LineEvent.Frequency);
+        }
+    }
+
+    private IEnumerator AutoAdvanceAfterDelay(float delay)
+    {
+        float remainingDelay = Mathf.Max(0f, delay);
+        while (remainingDelay > 0f)
+        {
+            remainingDelay -= Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        autoAdvanceRoutine = null;
+        ShowNextLine();
+    }
+
+    private void CancelAutoAdvance()
+    {
+        if (autoAdvanceRoutine == null)
+        {
+            return;
+        }
+
+        StopCoroutine(autoAdvanceRoutine);
+        autoAdvanceRoutine = null;
     }
 }

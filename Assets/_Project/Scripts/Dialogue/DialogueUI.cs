@@ -5,20 +5,56 @@ using UnityEngine.UI;
 [DisallowMultipleComponent]
 public sealed class DialogueUI : MonoBehaviour
 {
-    private const string PanelName = "DialoguePanel";
+    private const string ProjectDialogueFontResourcePath = "Fonts/VCR_OSD_MONO_1.001";
+    private const string PanelFrameName = "DialoguePanel";
+    private const string PanelFillName = "DialoguePanelFill";
+    private const string DistressOverlayName = "DialogueDistressOverlay";
+    private const string SpeakerPlateName = "SpeakerPlate";
+    private const string SpeakerDividerName = "SpeakerDivider";
     private const string SpeakerLabelName = "SpeakerLabel";
     private const string BodyLabelName = "BodyLabel";
     private const string ContinueLabelName = "ContinueLabel";
+    private const string ContinueGlyphName = "ContinueGlyph";
 
+    [Header("References")]
     [SerializeField] private Canvas overlayCanvas;
     [SerializeField] private CanvasScaler canvasScaler;
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private Image panelBackground;
+    [SerializeField] private Image panelFill;
+    [SerializeField] private Image distressOverlay;
+    [SerializeField] private Image speakerPlate;
+    [SerializeField] private Image speakerDivider;
     [SerializeField] private TextMeshProUGUI speakerLabel;
     [SerializeField] private TextMeshProUGUI bodyLabel;
     [SerializeField] private TextMeshProUGUI continueLabel;
+    [SerializeField] private TextMeshProUGUI continueGlyph;
+    [SerializeField] private DialogueTextAnimator textAnimator;
     [SerializeField] private TMP_FontAsset dialogueFont;
+
+    [Header("Layout")]
     [SerializeField] private int sortingOrder = 120;
+    [SerializeField] private Vector2 panelSize = new Vector2(980f, 220f);
+    [SerializeField] private Vector2 panelAnchoredPosition = new Vector2(0f, 44f);
+    [SerializeField] [Min(1f)] private float borderThickness = 2f;
+    [SerializeField] [Min(24f)] private float speakerAreaHeight = 38f;
+
+    [Header("Colors")]
+    [SerializeField] private Color panelColor = new Color(0.04f, 0.04f, 0.045f, 0.96f);
+    [SerializeField] private Color borderColor = new Color(0.57f, 0.67f, 0.69f, 0.82f);
+    [SerializeField] private Color speakerPlateColor = new Color(0.11f, 0.11f, 0.12f, 0.94f);
+    [SerializeField] private Color distressOverlayColor = new Color(0.22f, 0.24f, 0.26f, 0.025f);
+    [SerializeField] private Color continueTextColor = new Color(0.76f, 0.79f, 0.81f, 0.82f);
+    [SerializeField] private Color continueGlyphColor = new Color(0.66f, 0.84f, 0.88f, 0.9f);
+
+    [Header("Animation")]
+    [SerializeField] private bool animateVisualNoise = true;
+    [SerializeField] [Range(0f, 0.5f)] private float borderFlickerStrength = 0.05f;
+    [SerializeField] [Min(0f)] private float borderFlickerSpeed = 1.4f;
+    [SerializeField] [Range(0f, 2f)] private float overlayJitterAmount = 0.12f;
+    [SerializeField] [Min(0f)] private float overlayJitterSpeed = 2.1f;
+    [SerializeField] [Range(0f, 0.75f)] private float continuePulseStrength = 0.12f;
+    [SerializeField] [Min(0f)] private float continuePulseSpeed = 2.2f;
 
     public TMP_Text BodyText => bodyLabel;
 
@@ -26,6 +62,16 @@ public sealed class DialogueUI : MonoBehaviour
     {
         EnsureSetup();
         SetVisible(false);
+    }
+
+    private void LateUpdate()
+    {
+        if (panelBackground == null || panelFill == null || distressOverlay == null)
+        {
+            return;
+        }
+
+        UpdateVisualNoise();
     }
 
     public static DialogueUI Create(Transform parent)
@@ -43,18 +89,20 @@ public sealed class DialogueUI : MonoBehaviour
         canvasGroup.blocksRaycasts = false;
     }
 
-    public void ShowLine(DialogueLine line)
+    public void ShowLine(DialogueLine line, DialogueProcessedText processedText)
     {
         EnsureSetup();
 
         string speakerName = line != null ? line.SpeakerName : string.Empty;
-        string dialogueText = line != null ? line.DialogueText : string.Empty;
+        string dialogueText = processedText != null ? processedText.DisplayText : line != null ? line.DialogueText : string.Empty;
 
         speakerLabel.text = speakerName;
         speakerLabel.gameObject.SetActive(!string.IsNullOrWhiteSpace(speakerName));
+        speakerLabel.color = line != null ? line.SpeakerNameColor : Color.white;
         bodyLabel.text = dialogueText ?? string.Empty;
+        bodyLabel.color = ResolveDialogueTextColor(line);
         bodyLabel.maxVisibleCharacters = 0;
-        ApplyTextEffect(line != null ? line.TextEffect : DialogueTextEffect.None);
+        ApplyTextEffect(line != null ? line.TextEffect : DialogueTextEffect.None, processedText != null ? processedText.EffectSpans : null);
         SetContinueVisible(false);
     }
 
@@ -62,6 +110,7 @@ public sealed class DialogueUI : MonoBehaviour
     {
         EnsureSetup();
         continueLabel.gameObject.SetActive(visible);
+        continueGlyph.gameObject.SetActive(visible);
     }
 
     public void SetContinueText(string text)
@@ -91,47 +140,122 @@ public sealed class DialogueUI : MonoBehaviour
         canvasScaler.matchWidthOrHeight = 0.5f;
 
         canvasGroup = GetOrAddComponent<CanvasGroup>(gameObject, canvasGroup);
+        EnsureProjectFont();
 
-        RectTransform panelRect = EnsurePanel();
-        EnsureLabels(panelRect);
+        RectTransform panelRect = EnsurePanelFrame();
+        RectTransform fillRect = EnsurePanelFill(panelRect);
+        RectTransform speakerPlateRect = EnsureSpeakerPlate(fillRect);
+        EnsureLabels(fillRect, speakerPlateRect);
+        textAnimator = GetOrAddComponent<DialogueTextAnimator>(gameObject, textAnimator);
+        textAnimator.SetTarget(bodyLabel);
+        ApplyStaticVisuals();
     }
 
-    private RectTransform EnsurePanel()
+    private RectTransform EnsurePanelFrame()
     {
-        if (panelBackground == null)
-        {
-            Transform panelTransform = transform.Find(PanelName);
-            if (panelTransform == null)
-            {
-                GameObject panelObject = new GameObject(PanelName, typeof(RectTransform), typeof(Image));
-                panelObject.transform.SetParent(transform, false);
-                panelTransform = panelObject.transform;
-            }
-
-            panelBackground = panelTransform.GetComponent<Image>();
-        }
+        panelBackground = EnsureImage(transform, PanelFrameName, panelBackground);
 
         RectTransform panelRect = panelBackground.rectTransform;
         panelRect.anchorMin = new Vector2(0.5f, 0f);
         panelRect.anchorMax = new Vector2(0.5f, 0f);
         panelRect.pivot = new Vector2(0.5f, 0f);
-        panelRect.anchoredPosition = new Vector2(0f, 48f);
-        panelRect.sizeDelta = new Vector2(980f, 220f);
-
-        panelBackground.color = new Color(0.05f, 0.05f, 0.05f, 0.92f);
+        panelRect.anchoredPosition = panelAnchoredPosition;
+        panelRect.sizeDelta = panelSize;
         return panelRect;
     }
 
-    private void EnsureLabels(RectTransform panelRect)
+    private RectTransform EnsurePanelFill(RectTransform panelRect)
     {
-        speakerLabel = EnsureTextLabel(panelRect, SpeakerLabelName, speakerLabel, new Vector2(24f, -18f), new Vector2(-24f, -62f), 30f, FontStyles.Bold, TextAlignmentOptions.Left);
-        bodyLabel = EnsureTextLabel(panelRect, BodyLabelName, bodyLabel, new Vector2(24f, -64f), new Vector2(-24f, -42f), 36f, FontStyles.Normal, TextAlignmentOptions.TopLeft);
+        panelFill = EnsureImage(panelRect, PanelFillName, panelFill);
+
+        RectTransform fillRect = panelFill.rectTransform;
+        fillRect.anchorMin = Vector2.zero;
+        fillRect.anchorMax = Vector2.one;
+        fillRect.offsetMin = new Vector2(borderThickness, borderThickness);
+        fillRect.offsetMax = new Vector2(-borderThickness, -borderThickness);
+        fillRect.localScale = Vector3.one;
+
+        distressOverlay = EnsureImage(fillRect, DistressOverlayName, distressOverlay);
+        RectTransform distressRect = distressOverlay.rectTransform;
+        distressRect.anchorMin = Vector2.zero;
+        distressRect.anchorMax = Vector2.one;
+        distressRect.offsetMin = new Vector2(10f, 10f);
+        distressRect.offsetMax = new Vector2(-10f, -10f);
+        distressRect.localScale = Vector3.one;
+
+        return fillRect;
+    }
+
+    private RectTransform EnsureSpeakerPlate(RectTransform fillRect)
+    {
+        speakerPlate = EnsureImage(fillRect, SpeakerPlateName, speakerPlate);
+        RectTransform plateRect = speakerPlate.rectTransform;
+        plateRect.anchorMin = new Vector2(0f, 1f);
+        plateRect.anchorMax = new Vector2(1f, 1f);
+        plateRect.pivot = new Vector2(0.5f, 1f);
+        plateRect.anchoredPosition = Vector2.zero;
+        plateRect.sizeDelta = new Vector2(0f, speakerAreaHeight);
+        plateRect.localScale = Vector3.one;
+
+        speakerDivider = EnsureImage(plateRect, SpeakerDividerName, speakerDivider);
+        RectTransform dividerRect = speakerDivider.rectTransform;
+        dividerRect.anchorMin = new Vector2(0f, 0f);
+        dividerRect.anchorMax = new Vector2(1f, 0f);
+        dividerRect.pivot = new Vector2(0.5f, 0f);
+        dividerRect.anchoredPosition = Vector2.zero;
+        dividerRect.sizeDelta = new Vector2(0f, 1f);
+        dividerRect.localScale = Vector3.one;
+
+        return plateRect;
+    }
+
+    private void EnsureLabels(RectTransform fillRect, RectTransform speakerPlateRect)
+    {
+        speakerLabel = EnsureTextLabel(
+            speakerPlateRect,
+            SpeakerLabelName,
+            speakerLabel,
+            new Vector2(18f, 7f),
+            new Vector2(-18f, -6f),
+            26f,
+            FontStyles.Bold,
+            TextAlignmentOptions.Left);
+
+        bodyLabel = EnsureTextLabel(
+            fillRect,
+            BodyLabelName,
+            bodyLabel,
+            new Vector2(24f, 28f),
+            new Vector2(-24f, -(speakerAreaHeight + 16f)),
+            32f,
+            FontStyles.Normal,
+            TextAlignmentOptions.TopLeft);
         bodyLabel.textWrappingMode = TextWrappingModes.Normal;
         bodyLabel.overflowMode = TextOverflowModes.Overflow;
 
-        continueLabel = EnsureTextLabel(panelRect, ContinueLabelName, continueLabel, new Vector2(-180f, 18f), new Vector2(-24f, 18f), 24f, FontStyles.Normal, TextAlignmentOptions.BottomRight);
+        continueLabel = EnsureTextLabel(
+            fillRect,
+            ContinueLabelName,
+            continueLabel,
+            new Vector2(-230f, 12f),
+            new Vector2(-42f, 16f),
+            17f,
+            FontStyles.Normal,
+            TextAlignmentOptions.BottomRight);
         continueLabel.text = "Continue";
         continueLabel.gameObject.SetActive(false);
+
+        continueGlyph = EnsureTextLabel(
+            fillRect,
+            ContinueGlyphName,
+            continueGlyph,
+            new Vector2(-38f, 12f),
+            new Vector2(-16f, 14f),
+            18f,
+            FontStyles.Bold,
+            TextAlignmentOptions.BottomRight);
+        continueGlyph.text = ">";
+        continueGlyph.gameObject.SetActive(false);
     }
 
     private TextMeshProUGUI EnsureTextLabel(
@@ -167,31 +291,119 @@ public sealed class DialogueUI : MonoBehaviour
         existingLabel.font = dialogueFont != null ? dialogueFont : TMP_Settings.defaultFontAsset;
         existingLabel.fontSize = fontSize;
         existingLabel.fontStyle = fontStyle;
-        existingLabel.color = Color.white;
         existingLabel.alignment = alignment;
         existingLabel.raycastTarget = false;
+        existingLabel.enableAutoSizing = false;
 
         return existingLabel;
     }
 
-    private void ApplyTextEffect(DialogueTextEffect textEffect)
+    private Image EnsureImage(Transform parent, string objectName, Image existingImage)
+    {
+        if (existingImage == null)
+        {
+            Transform imageTransform = parent.Find(objectName);
+            if (imageTransform == null)
+            {
+                GameObject imageObject = new GameObject(objectName, typeof(RectTransform), typeof(Image));
+                imageObject.transform.SetParent(parent, false);
+                imageTransform = imageObject.transform;
+            }
+
+            existingImage = imageTransform.GetComponent<Image>();
+        }
+
+        existingImage.raycastTarget = false;
+        return existingImage;
+    }
+
+    private void ApplyTextEffect(DialogueTextEffect textEffect, DialogueTextEffectSpan[] inlineEffectSpans)
     {
         if (bodyLabel == null)
         {
             return;
         }
 
-        bodyLabel.fontStyle = FontStyles.Normal;
+        bodyLabel.fontStyle = ResolveDialogueFontStyle(textEffect);
 
-        switch (textEffect)
+        if (textAnimator != null)
         {
-            case DialogueTextEffect.None:
-            case DialogueTextEffect.Shake:
-            case DialogueTextEffect.Wave:
-            case DialogueTextEffect.Glitch:
-            default:
-                break;
+            textAnimator.SetEffect(textEffect);
+            textAnimator.SetInlineEffects(inlineEffectSpans);
+            textAnimator.RefreshCachedMesh();
         }
+    }
+
+    private void ApplyStaticVisuals()
+    {
+        panelFill.color = panelColor;
+        speakerPlate.color = speakerPlateColor;
+        speakerDivider.color = MultiplyAlpha(borderColor, 0.7f);
+        continueLabel.color = continueTextColor;
+        continueGlyph.color = continueGlyphColor;
+    }
+
+    private void UpdateVisualNoise()
+    {
+        float time = Time.unscaledTime;
+        float borderIntensity = 1f;
+        float overlayAlpha = 1f;
+        float glyphPulse = 1f;
+
+        if (animateVisualNoise)
+        {
+            borderIntensity = Mathf.Lerp(1f - borderFlickerStrength, 1f + (borderFlickerStrength * 0.35f), Mathf.PerlinNoise(0.19f, time * borderFlickerSpeed));
+            overlayAlpha = Mathf.Lerp(1f - borderFlickerStrength, 1f + borderFlickerStrength, Mathf.PerlinNoise(0.73f, time * (borderFlickerSpeed * 0.8f)));
+            glyphPulse = Mathf.Lerp(1f - continuePulseStrength, 1f, (Mathf.Sin(time * continuePulseSpeed) + 1f) * 0.5f);
+
+            RectTransform overlayRect = distressOverlay.rectTransform;
+            overlayRect.anchoredPosition = new Vector2(
+                (Mathf.PerlinNoise(time * overlayJitterSpeed, 0.14f) - 0.5f) * 2f * overlayJitterAmount,
+                (Mathf.PerlinNoise(0.27f, time * overlayJitterSpeed) - 0.5f) * 2f * overlayJitterAmount);
+
+            continueGlyph.rectTransform.anchoredPosition = new Vector2(0f, Mathf.Sin(time * continuePulseSpeed) * 0.6f);
+        }
+        else
+        {
+            distressOverlay.rectTransform.anchoredPosition = Vector2.zero;
+            continueGlyph.rectTransform.anchoredPosition = Vector2.zero;
+        }
+
+        panelBackground.color = MultiplyRgb(borderColor, borderIntensity);
+        distressOverlay.color = MultiplyAlpha(distressOverlayColor, overlayAlpha);
+        continueLabel.color = continueLabel.gameObject.activeSelf ? MultiplyAlpha(continueTextColor, glyphPulse) : continueTextColor;
+        continueGlyph.color = continueGlyph.gameObject.activeSelf ? MultiplyAlpha(continueGlyphColor, glyphPulse) : continueGlyphColor;
+    }
+
+    private Color ResolveDialogueTextColor(DialogueLine line)
+    {
+        Color baseColor = line != null ? line.DialogueTextColor : Color.white;
+        if (line == null)
+        {
+            return baseColor;
+        }
+
+        if (line.TextEffect == DialogueTextEffect.Whisper)
+        {
+            baseColor.a *= 0.82f;
+        }
+
+        return baseColor;
+    }
+
+    private static FontStyles ResolveDialogueFontStyle(DialogueTextEffect textEffect)
+    {
+        return textEffect == DialogueTextEffect.Shout ? FontStyles.Bold : FontStyles.Normal;
+    }
+
+    private static Color MultiplyAlpha(Color color, float multiplier)
+    {
+        return new Color(color.r, color.g, color.b, color.a * multiplier);
+    }
+
+    private static Color MultiplyRgb(Color color, float multiplier)
+    {
+        return new Color(color.r * multiplier, color.g * multiplier, color.b * multiplier, color.a);
     }
 
     private static T GetOrAddComponent<T>(GameObject target, T existingComponent) where T : Component
@@ -208,5 +420,26 @@ public sealed class DialogueUI : MonoBehaviour
         }
 
         return component;
+    }
+
+    private void OnEnable()
+    {
+        EnsureProjectFont();
+    }
+
+    private void EnsureProjectFont()
+    {
+        if (dialogueFont != null)
+        {
+            return;
+        }
+
+        Font sourceFont = Resources.Load<Font>(ProjectDialogueFontResourcePath);
+        if (sourceFont == null)
+        {
+            return;
+        }
+
+        dialogueFont = TMP_FontAsset.CreateFontAsset(sourceFont);
     }
 }

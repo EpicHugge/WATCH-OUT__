@@ -33,6 +33,11 @@ public sealed class DialogueConversation : ScriptableObject
             return line.VoiceProfileOverride;
         }
 
+        if (line.SpeakerPreset != null && line.SpeakerPreset.DefaultVoiceProfile != null)
+        {
+            return line.SpeakerPreset.DefaultVoiceProfile;
+        }
+
         string speakerName = line.SpeakerName;
         if (string.IsNullOrWhiteSpace(speakerName) || speakerVoices == null)
         {

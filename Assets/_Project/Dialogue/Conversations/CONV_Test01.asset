@@ -21,15 +21,43 @@ MonoBehaviour:
   - speakerName: Test02
     voiceProfile: {fileID: 11400000, guid: f4633fb08c58ffb4eafa001c645f6a93, type: 2}
   lines:
-  - speakerName: Test01
+  - speakerPreset: {fileID: 11400000, guid: 309f315d09454594c92864218ea3cf18, type: 2}
+    speakerName: 
     dialogueText: Yoo! This is a test text for the dialogue
-    textEffect: 0
+    overrideTextEffect: 1
+    textEffect: 4
+    overrideSpeakerNameColor: 0
+    speakerNameColor: {r: 1, g: 0.0047169924, b: 0.094961785, a: 1}
+    overrideDialogueTextColor: 0
+    dialogueTextColor: {r: 1, g: 0, b: 0, a: 1}
     overrideRevealSpeed: 1
     charactersPerSecond: 30
     voiceProfileOverride: {fileID: 0}
-  - speakerName: Test02
-    dialogueText: This is awesome!
+    lineEvent:
+      eventType: 1
+      triggerTiming: 0
+      duration: 0.2
+      magnitude: 0.08
+      frequency: 24
+    autoAdvance: 0
+    autoAdvanceDelay: 0.15
+  - speakerPreset: {fileID: 0}
+    speakerName: Test02
+    dialogueText: This is, <wave><color=#F907FF>awesome!</color></wave>
+    overrideTextEffect: 0
     textEffect: 0
+    overrideSpeakerNameColor: 0
+    speakerNameColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideDialogueTextColor: 0
+    dialogueTextColor: {r: 1, g: 1, b: 1, a: 1}
     overrideRevealSpeed: 1
     charactersPerSecond: 10
     voiceProfileOverride: {fileID: 0}
+    lineEvent:
+      eventType: 0
+      triggerTiming: 0
+      duration: 0.2
+      magnitude: 0.08
+      frequency: 24
+    autoAdvance: 0
+    autoAdvanceDelay: 0.15
