@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using System;
 
 [DisallowMultipleComponent]
 public sealed class GeneratorInteractable : InteractableBase
@@ -26,6 +27,9 @@ public sealed class GeneratorInteractable : InteractableBase
     private Quaternion onLeverRotation;
 
     public bool IsOn => isOn;
+    public event Action TurnedOn;
+    public event Action TurnedOff;
+    public event Action<bool> StateChanged;
 
     protected override void Awake()
     {
@@ -66,11 +70,15 @@ public sealed class GeneratorInteractable : InteractableBase
         if (isOn)
         {
             onTurnedOn?.Invoke();
+            TurnedOn?.Invoke();
         }
         else
         {
             onTurnedOff?.Invoke();
+            TurnedOff?.Invoke();
         }
+
+        StateChanged?.Invoke(isOn);
     }
 
     private void ApplyVisualState()
