@@ -1084,7 +1084,7 @@ PrefabInstance:
     - target: {fileID: 4173517666909797129, guid: eb2b8af7391fa50469451fa5463b0e32, type: 3}
       propertyPath: cassetteData
       value: 
-      objectReference: {fileID: 11400000, guid: 39d0dd52ecf24bb3ba7b78f81ebf5cf8, type: 2}
+      objectReference: {fileID: 11400000, guid: fed42875686645a9819166d7899d4b68, type: 2}
     - target: {fileID: 5318600072560130618, guid: eb2b8af7391fa50469451fa5463b0e32, type: 3}
       propertyPath: objectToMove
       value: 
@@ -1178,11 +1178,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4173517666909797129, guid: eb2b8af7391fa50469451fa5463b0e32, type: 3}
       propertyPath: slotMode
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4173517666909797129, guid: eb2b8af7391fa50469451fa5463b0e32, type: 3}
+      propertyPath: cassetteData
+      value: 
+      objectReference: {fileID: 11400000, guid: 34ebf78b414f41b1bbcf36c6a62b1c34, type: 2}
     - target: {fileID: 5318600072560130618, guid: eb2b8af7391fa50469451fa5463b0e32, type: 3}
       propertyPath: prompt
-      value: WIP
+      value: Pick Cassette
       objectReference: {fileID: 0}
     - target: {fileID: 5318600072560130618, guid: eb2b8af7391fa50469451fa5463b0e32, type: 3}
       propertyPath: objectToMove

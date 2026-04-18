@@ -142,9 +142,7 @@ public sealed class GeneratorInteractable : InteractableBase
             return;
         }
 
-        bool canTurnOnNow = progressionManager.CurrentPhase == DayPhase.NeedGenerator &&
-            !progressionManager.PowerOutTriggeredToday;
-        SetLocked(!isOn && !canTurnOnNow);
+        SetLocked(!progressionManager.CanInteractWithGenerator);
     }
 
     private void ApplyVisualState()

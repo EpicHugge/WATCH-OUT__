@@ -13,6 +13,7 @@ public sealed class CassetteShelfSlot : MonoBehaviour
     [SerializeField] private SlotMode slotMode = SlotMode.Functional;
     [SerializeField] private CassetteData cassetteData;
     [SerializeField] private CassettePlayerReceiver cassettePlayerReceiver;
+    [SerializeField] private ProgressionManager progressionManager;
     [SerializeField] private HoverMoveInteractable hoverInteractable;
     [SerializeField] private Collider interactionCollider;
     [SerializeField] private GameObject visualToHide;
@@ -30,12 +31,34 @@ public sealed class CassetteShelfSlot : MonoBehaviour
     {
         ResolveReferences();
         ApplyPrompt();
+        RefreshAvailabilityState();
+    }
+
+    private void OnEnable()
+    {
+        ResolveReferences();
+
+        if (progressionManager != null)
+        {
+            progressionManager.StateChanged += RefreshAvailabilityState;
+        }
+
+        RefreshAvailabilityState();
+    }
+
+    private void OnDisable()
+    {
+        if (progressionManager != null)
+        {
+            progressionManager.StateChanged -= RefreshAvailabilityState;
+        }
     }
 
     private void OnValidate()
     {
         ResolveReferences();
         ApplyPrompt();
+        RefreshAvailabilityState();
     }
 
     public void HandleInteract()
@@ -94,6 +117,11 @@ public sealed class CassetteShelfSlot : MonoBehaviour
         {
             cassettePlayerReceiver = FindAnyObjectByType<CassettePlayerReceiver>();
         }
+
+        if (progressionManager == null && Application.isPlaying)
+        {
+            progressionManager = FindAnyObjectByType<ProgressionManager>();
+        }
     }
 
     private void ApplyPrompt()
@@ -104,5 +132,40 @@ public sealed class CassetteShelfSlot : MonoBehaviour
         }
 
         hoverInteractable.SetPrompt(IsWorkInProgress ? workInProgressPrompt : functionalPrompt);
+    }
+
+    private void RefreshAvailabilityState()
+    {
+        if (hoverInteractable == null)
+        {
+            return;
+        }
+
+        if (hasBeenPickedUp)
+        {
+            hoverInteractable.SetInteractionEnabled(false);
+            return;
+        }
+
+        if (IsWorkInProgress)
+        {
+            hoverInteractable.SetInteractionEnabled(true);
+            hoverInteractable.SetLocked(false);
+            hoverInteractable.SetPrompt(workInProgressPrompt);
+            return;
+        }
+
+        if (progressionManager == null)
+        {
+            hoverInteractable.SetInteractionEnabled(true);
+            hoverInteractable.SetLocked(false);
+            hoverInteractable.SetPrompt(functionalPrompt);
+            return;
+        }
+
+        bool canChooseCassette = progressionManager.CanSelectCassette(cassetteData);
+        hoverInteractable.SetPrompt(functionalPrompt);
+        hoverInteractable.SetLocked(false);
+        hoverInteractable.SetInteractionEnabled(canChooseCassette || progressionManager.UnlockAllInteractionsForDebug);
     }
 }

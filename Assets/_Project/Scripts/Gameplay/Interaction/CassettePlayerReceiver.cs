@@ -12,6 +12,7 @@ public sealed class CassettePlayerReceiver : MonoBehaviour
     [SerializeField] private bool replaceLoadedCassette = true;
 
     private CassetteData loadedCassette;
+    private CassetteData pendingPlaybackCassette;
 
     public CassetteData LoadedCassette => loadedCassette;
     public bool HasLoadedCassette => loadedCassette != null;
@@ -20,6 +21,24 @@ public sealed class CassettePlayerReceiver : MonoBehaviour
     {
         ResolveReferences();
         RefreshVisualState();
+    }
+
+    private void OnEnable()
+    {
+        ResolveReferences();
+
+        if (dialogueRunner != null)
+        {
+            dialogueRunner.ConversationEnded += HandleConversationEnded;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (dialogueRunner != null)
+        {
+            dialogueRunner.ConversationEnded -= HandleConversationEnded;
+        }
     }
 
     public bool TrySelectCassette(CassetteData cassette)
@@ -55,6 +74,11 @@ public sealed class CassettePlayerReceiver : MonoBehaviour
 
         ResolveReferences();
 
+        if (progressionManager != null && !progressionManager.CanPlayCassette(loadedCassette))
+        {
+            return false;
+        }
+
         if (loadedCassette.BroadcastConversation != null)
         {
             if (dialogueRunner == null)
@@ -63,10 +87,14 @@ public sealed class CassettePlayerReceiver : MonoBehaviour
                 return false;
             }
 
+            pendingPlaybackCassette = loadedCassette;
             if (!dialogueRunner.StartConversation(loadedCassette.BroadcastConversation))
             {
+                pendingPlaybackCassette = null;
                 return false;
             }
+
+            return true;
         }
 
         progressionManager?.MarkCassettePlaybackStarted(loadedCassette);
@@ -84,6 +112,22 @@ public sealed class CassettePlayerReceiver : MonoBehaviour
         {
             dialogueRunner = FindAnyObjectByType<DialogueRunner>();
         }
+    }
+
+    private void HandleConversationEnded(DialogueConversation conversation)
+    {
+        if (pendingPlaybackCassette == null || conversation == null)
+        {
+            return;
+        }
+
+        if (pendingPlaybackCassette.BroadcastConversation != conversation)
+        {
+            return;
+        }
+
+        progressionManager?.MarkCassettePlaybackStarted(pendingPlaybackCassette);
+        pendingPlaybackCassette = null;
     }
 
     private void RefreshVisualState()

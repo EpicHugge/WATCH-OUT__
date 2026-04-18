@@ -63,7 +63,7 @@ namespace WatchOut
         private float holdTimer;
         private float changeTimer;
         private RadioEventData currentLockedEvent;
-        private Coroutine pendingDebugLoopRoutine;
+        private RadioEventData pendingResolvedEvent;
         private MaterialPropertyBlock screenPropertyBlock;
 
         public float CurrentFrequency => currentFrequency;
@@ -82,6 +82,11 @@ namespace WatchOut
                 progressionManager.StateChanged += HandleProgressionStateChanged;
             }
 
+            if (dialogueRunner != null)
+            {
+                dialogueRunner.ConversationEnded += HandleDialogueEnded;
+            }
+
             if (generatorInteractable != null)
             {
                 generatorInteractable.StateChanged += HandleGeneratorStateChanged;
@@ -93,6 +98,11 @@ namespace WatchOut
             if (progressionManager != null)
             {
                 progressionManager.StateChanged -= HandleProgressionStateChanged;
+            }
+
+            if (dialogueRunner != null)
+            {
+                dialogueRunner.ConversationEnded -= HandleDialogueEnded;
             }
 
             if (generatorInteractable != null)
@@ -242,6 +252,16 @@ namespace WatchOut
 
         private void LockOnSignal(RadioEventData radioEvent)
         {
+            if (radioEvent == null)
+            {
+                return;
+            }
+
+            if (progressionManager != null && !progressionManager.IsCurrentTargetRadioEvent(radioEvent))
+            {
+                return;
+            }
+
             currentLockedEvent = radioEvent;
             manualSignalLockArmed = false;
 
@@ -259,16 +279,21 @@ namespace WatchOut
                 exactLockAudioSource.PlayOneShot(exactLockClip);
             }
 
-            bool eventFoundNow = progressionManager == null || progressionManager.MarkRadioEventFound(radioEvent);
-
-            if (eventFoundNow && radioEvent.DialogueConversation != null && dialogueRunner != null)
+            if (radioEvent.DialogueConversation != null && dialogueRunner != null)
             {
+                pendingResolvedEvent = radioEvent;
                 SyncStaticLoopPlayback(false);
                 staticAudioSource.volume = 0f;
-                dialogueRunner.StartConversation(radioEvent.DialogueConversation);
+                if (!dialogueRunner.StartConversation(radioEvent.DialogueConversation))
+                {
+                    pendingResolvedEvent = null;
+                    return;
+                }
+
+                return;
             }
 
-            HandleDebugLoopCompletion(eventFoundNow);
+            progressionManager?.MarkRadioEventFound(radioEvent);
         }
 
         public void SetIncreasing(bool value)
@@ -505,6 +530,7 @@ namespace WatchOut
             {
                 currentFrequency = minFrequency;
                 currentLockedEvent = null;
+                pendingResolvedEvent = null;
                 UpdateDisplay();
             }
 
@@ -585,34 +611,22 @@ namespace WatchOut
             }
         }
 
-        private void HandleDebugLoopCompletion(bool eventFoundNow)
+        private void HandleDialogueEnded(DialogueConversation conversation)
         {
-            if (!eventFoundNow ||
-                progressionManager == null ||
-                !progressionManager.PowerDownGeneratorAndRadioAfterDialogueInTestBuild)
+            if (pendingResolvedEvent == null || conversation == null)
             {
                 return;
             }
 
-            if (pendingDebugLoopRoutine != null)
+            if (pendingResolvedEvent.DialogueConversation != conversation)
             {
-                StopCoroutine(pendingDebugLoopRoutine);
+                return;
             }
 
-            pendingDebugLoopRoutine = StartCoroutine(CompleteDebugLoopAfterDialogueRoutine());
-        }
-
-        private IEnumerator CompleteDebugLoopAfterDialogueRoutine()
-        {
-            while (dialogueRunner != null && dialogueRunner.IsRunning)
-            {
-                yield return null;
-            }
-
-            pendingDebugLoopRoutine = null;
-
-            progressionManager.CompleteDebugRadioLoopAfterDialogue();
-            generatorInteractable?.SetPowerState(false);
+            RadioEventData resolvedEvent = pendingResolvedEvent;
+            pendingResolvedEvent = null;
+            currentLockedEvent = null;
+            progressionManager?.MarkRadioEventFound(resolvedEvent);
             RefreshPowerState();
         }
 

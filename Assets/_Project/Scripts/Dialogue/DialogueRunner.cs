@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -34,6 +35,9 @@ public sealed class DialogueRunner : MonoBehaviour
     private Coroutine autoAdvanceRoutine;
 
     public bool IsRunning => currentConversation != null;
+    public DialogueConversation CurrentConversation => currentConversation;
+    public event Action<DialogueConversation> ConversationStarted;
+    public event Action<DialogueConversation> ConversationEnded;
 
     private void Awake()
     {
@@ -101,6 +105,7 @@ public sealed class DialogueRunner : MonoBehaviour
         }
 
         dialogueUI.SetVisible(true);
+        ConversationStarted?.Invoke(currentConversation);
         ShowNextLine();
         return true;
     }
@@ -134,6 +139,7 @@ public sealed class DialogueRunner : MonoBehaviour
 
     public void EndConversation()
     {
+        DialogueConversation endedConversation = currentConversation;
         currentConversation = null;
         currentLineIndex = -1;
         waitForAdvanceRelease = false;
@@ -164,6 +170,11 @@ public sealed class DialogueRunner : MonoBehaviour
         if (playerController != null)
         {
             playerController.enabled = restorePlayerControllerEnabled;
+        }
+
+        if (endedConversation != null)
+        {
+            ConversationEnded?.Invoke(endedConversation);
         }
     }
 
