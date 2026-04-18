@@ -20,6 +20,10 @@ public sealed class FirstPersonPlayerController : MonoBehaviour
     [SerializeField] private float backwardSpeedMultiplier = 0.72f;
     [SerializeField] private float movementSmoothTime = 0.22f;
     [SerializeField] private float airMovementSmoothTime = 0.38f;
+
+    [Header("Jump")]
+    [SerializeField] private bool jumpEnabled = true;
+    [SerializeField] private Key keyboardJumpKey = Key.Space;
     [SerializeField] private float jumpHeight = 0.9f;
     [SerializeField] private float gravity = -28f;
     [SerializeField] private float groundedGravity = -2f;
@@ -119,6 +123,8 @@ public sealed class FirstPersonPlayerController : MonoBehaviour
         lookAction = playerInput.actions["Look"];
         jumpAction = playerInput.actions["Jump"];
         sprintAction = playerInput.actions["Sprint"];
+
+        ConfigureJumpAction();
     }
 
     private void HandleMovement()
@@ -146,7 +152,7 @@ public sealed class FirstPersonPlayerController : MonoBehaviour
             verticalVelocity = groundedGravity;
         }
 
-        if (jumpAction != null && jumpAction.WasPressedThisFrame() && characterController.isGrounded)
+        if (jumpEnabled && jumpAction != null && jumpAction.WasPressedThisFrame() && characterController.isGrounded)
         {
             verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
         }
@@ -331,5 +337,34 @@ public sealed class FirstPersonPlayerController : MonoBehaviour
         lookSmoothTime = 0.08f;
         minPitch = -80f;
         maxPitch = 80f;
+    }
+
+    private void ConfigureJumpAction()
+    {
+        if (jumpAction == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < jumpAction.bindings.Count; i++)
+        {
+            InputBinding binding = jumpAction.bindings[i];
+            if (string.IsNullOrEmpty(binding.path) || !binding.path.StartsWith("<Keyboard>/"))
+            {
+                continue;
+            }
+
+            jumpAction.ApplyBindingOverride(i, new InputBinding { overridePath = GetKeyboardBindingPath(keyboardJumpKey) });
+        }
+    }
+
+    private static string GetKeyboardBindingPath(Key key)
+    {
+        return key switch
+        {
+            Key.None => string.Empty,
+            _ when Keyboard.current != null => Keyboard.current[key].path,
+            _ => string.Empty
+        };
     }
 }

@@ -16,6 +16,8 @@ public sealed class DialogueLine
     [SerializeField] private Color speakerNameColor = Color.white;
     [SerializeField] private bool overrideDialogueTextColor;
     [SerializeField] private Color dialogueTextColor = Color.white;
+    [SerializeField] private bool overrideBorderColor;
+    [SerializeField] private Color borderColor = new Color(0.57f, 0.67f, 0.69f, 0.82f);
 
     [Header("Reveal")]
     [SerializeField] private bool overrideRevealSpeed;
@@ -43,6 +45,9 @@ public sealed class DialogueLine
     public Color DialogueTextColor => speakerPreset != null && !overrideDialogueTextColor
         ? speakerPreset.DefaultDialogueTextColor
         : dialogueTextColor;
+    public Color BorderColor => speakerPreset != null && !overrideBorderColor
+        ? speakerPreset.DefaultBorderColor
+        : borderColor;
     public bool OverrideRevealSpeed => overrideRevealSpeed;
     public float CharactersPerSecond => Mathf.Max(1f, charactersPerSecond);
     public DialogueVoiceProfile VoiceProfileOverride => voiceProfileOverride;

@@ -145,6 +145,8 @@ public static class FirstPersonPlayerPrefabBuilder
             SetFieldValue(controller, "backwardSpeedMultiplier", 0.72f);
             SetFieldValue(controller, "movementSmoothTime", 0.22f);
             SetFieldValue(controller, "airMovementSmoothTime", 0.38f);
+            SetFieldValue(controller, "jumpEnabled", true);
+            SetFieldValue(controller, "keyboardJumpKey", Key.Space);
             SetFieldValue(controller, "jumpHeight", 0.9f);
             SetFieldValue(controller, "gravity", -28f);
             SetFieldValue(controller, "groundedGravity", -2f);
