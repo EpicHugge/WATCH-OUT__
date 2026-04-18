@@ -3236,6 +3236,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2e9360f7268f6014cb1e11e3873d68eb, type: 3}
+--- !u!114 &984374793 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3363507205731958488, guid: 2e9360f7268f6014cb1e11e3873d68eb, type: 3}
+  m_PrefabInstance: {fileID: 984374792}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b1fd479252091241a4c0990d109c2c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProgressionManager
 --- !u!43 &1079383062
 Mesh:
   m_ObjectHideFlags: 0
@@ -7853,11 +7864,53 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4626054200308726918, guid: ba23f410cdb088c4f86b257982a2a61f, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7491463930383192969, guid: ba23f410cdb088c4f86b257982a2a61f, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2379444603063701236}
   m_SourcePrefab: {fileID: 100100000, guid: ba23f410cdb088c4f86b257982a2a61f, type: 3}
+--- !u!1 &2379444603063701234 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7486721806264910500, guid: ba23f410cdb088c4f86b257982a2a61f, type: 3}
+  m_PrefabInstance: {fileID: 2379444603063701233}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2379444603063701235 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7491463930383192969, guid: ba23f410cdb088c4f86b257982a2a61f, type: 3}
+  m_PrefabInstance: {fileID: 2379444603063701233}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2379444603063701236
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2379444603063701235}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea901f492c2739c488979ec9e2e4de9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CassetteInteractable
+  interactionEnabled: 1
+  startsLocked: 0
+  interactionVerb: Interact
+  interactionDisplayName: 
+  lockedPrompt: Locked
+  onLockedInteract:
+    m_PersistentCalls:
+      m_Calls: []
+  cassetteData: {fileID: 0}
+  progressionManager: {fileID: 984374793}
+  defaultPrompt: Insert Cassette
+  disableOnSelect: 1
+  objectToDisable: {fileID: 2379444603063701234}
+  onCassetteSelected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
