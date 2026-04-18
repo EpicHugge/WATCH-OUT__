@@ -56,7 +56,7 @@ MonoBehaviour:
   radioEventsNeededBeforePowerOut: 1
   radioScanSecondsBeforePowerOut: 120
   frequencyMatchTolerance: 0.05
-  allowRadioDebugWithoutCassette: 1
+  allowRadioDebugWithoutCassette: 0
   repeatSameRadioLoopEveryNightInTestBuild: 1
   powerDownGeneratorAndRadioAfterDialogueInTestBuild: 1
   debugSetDay: 1

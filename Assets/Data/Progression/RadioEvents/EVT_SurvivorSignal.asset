@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97e1d5a3fffb4b24cafd7eb0f44b70ba, type: 3}
   m_Name: EVT_SurvivorSignal
   m_EditorClassIdentifier: Assembly-CSharp::RadioEventData
-  eventName: Survivor Signal
+  eventName: Emergency Broadcast
   targetFrequency: 94.3
   dialogueConversation: {fileID: 11400000, guid: 8ecb99b4102b9b342998895e6ba6448b, type: 2}
+  broadcastAudio: {fileID: 8300000, guid: abbe2165ee359b140b441bac0dcc797b, type: 3}
   minDay: 1
   maxDay: 0
   allowedCassettes:
