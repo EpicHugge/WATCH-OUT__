@@ -21,6 +21,7 @@ public sealed class PlayerInteractionController : MonoBehaviour
     private RaycastHit currentTargetHit;
     private string currentPrompt = string.Empty;
     private InteractionOutlineHighlight currentTargetHighlight;
+    private InteractableBase activeInteractable;
 
     public IInteractable CurrentTarget => currentTarget;
     public RaycastHit CurrentTargetHit => currentTargetHit;
@@ -62,6 +63,11 @@ public sealed class PlayerInteractionController : MonoBehaviour
 
     private void OnDisable()
     {
+        if (activeInteractable != null)
+        {
+            activeInteractable.EndInteract(this);
+            activeInteractable = null;
+        }
         ClearCurrentTarget();
     }
 
@@ -69,15 +75,30 @@ public sealed class PlayerInteractionController : MonoBehaviour
     {
         if (!interactionEnabled)
         {
+            if (activeInteractable != null)
+            {
+                activeInteractable.EndInteract(this);
+                activeInteractable = null;
+            }
             ClearCurrentTarget();
             return;
         }
 
         UpdateCurrentTarget();
 
-        if (currentTarget != null && WasInteractPressedThisFrame())
+        if (activeInteractable != null)
         {
-            currentTarget.Interact(this);
+            if (WasInteractReleasedThisFrame() || currentTarget != activeInteractable)
+            {
+                activeInteractable.EndInteract(this);
+                activeInteractable = null;
+            }
+        }
+
+        if (currentTarget != null && activeInteractable == null && WasInteractPressedThisFrame())
+        {
+            activeInteractable = currentTarget;
+            activeInteractable.Interact(this);
             RefreshCurrentTarget();
         }
     }
@@ -93,6 +114,11 @@ public sealed class PlayerInteractionController : MonoBehaviour
 
         if (!interactionEnabled)
         {
+            if (activeInteractable != null)
+            {
+                activeInteractable.EndInteract(this);
+                activeInteractable = null;
+            }
             ClearCurrentTarget();
         }
     }
@@ -174,6 +200,11 @@ public sealed class PlayerInteractionController : MonoBehaviour
     private bool WasInteractPressedThisFrame()
     {
         return Keyboard.current != null && Keyboard.current[interactKey].wasPressedThisFrame;
+    }
+
+    private bool WasInteractReleasedThisFrame()
+    {
+        return Keyboard.current != null && Keyboard.current[interactKey].wasReleasedThisFrame;
     }
 
     private string FormatPrompt(string prompt)

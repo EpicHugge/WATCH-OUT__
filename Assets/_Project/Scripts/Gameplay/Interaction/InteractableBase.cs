@@ -61,6 +61,32 @@ public abstract class InteractableBase : MonoBehaviour, IInteractable
         InteractInternal(interactor);
     }
 
+    public void EndInteract(PlayerInteractionController interactor)
+    {
+        if (!interactionEnabled)
+        {
+            return;
+        }
+
+        if (isLocked)
+        {
+            return;
+        }
+
+        EndInteractInternal(interactor);
+    }
+
+    public void OnHoverEnter(PlayerInteractionController interactor)
+    {
+        if (!interactionEnabled) return;
+        OnHoverEnterInternal(interactor);
+    }
+
+    public void OnHoverExit(PlayerInteractionController interactor)
+    {
+        OnHoverExitInternal(interactor);
+    }
+
     public void SetInteractionEnabled(bool isEnabled)
     {
         interactionEnabled = isEnabled;
@@ -72,6 +98,18 @@ public abstract class InteractableBase : MonoBehaviour, IInteractable
     }
 
     protected virtual void OnLockedInteract(PlayerInteractionController interactor)
+    {
+    }
+
+    protected virtual void EndInteractInternal(PlayerInteractionController interactor)
+    {
+    }
+
+    protected virtual void OnHoverEnterInternal(PlayerInteractionController interactor)
+    {
+    }
+
+    protected virtual void OnHoverExitInternal(PlayerInteractionController interactor)
     {
     }
 
