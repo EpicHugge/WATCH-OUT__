@@ -7516,11 +7516,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WatchOut.RadioSystem
   progressionManager: {fileID: 3363507205731958488, guid: 2e9360f7268f6014cb1e11e3873d68eb, type: 3}
   dialogueRunner: {fileID: 0}
+  generatorInteractable: {fileID: 0}
   frequencyDisplayText: {fileID: 1310939070}
-  staticAudioSource: {fileID: 0}
-  broadcastAudioSource: {fileID: 0}
+  poweredScreenRenderer: {fileID: 0}
+  screenPoweredColor: {r: 0.12, g: 0.36, b: 0.18, a: 1}
+  screenUnpoweredColor: {r: 0.02, g: 0.04, b: 0.03, a: 1}
+  staticAudioSource: {fileID: 952516016314871496}
   maxStaticVolume: 0.5
-  maxBroadcastVolume: 1
+  nearSignalAudioSource: {fileID: 952516016314871495}
+  exactLockAudioSource: {fileID: 952516016314871494}
+  staticLoopClip: {fileID: 0}
+  nearSignalLoopClip: {fileID: 0}
+  exactLockClip: {fileID: 0}
+  maxNearSignalVolume: 1
   minFrequency: 87.5
   maxFrequency: 108
   frequencyStep: 0.1
@@ -7529,6 +7537,10 @@ MonoBehaviour:
   autoScanSpeed: 2
   signalFadeRange: 0.5
   signalLockTolerance: 0.05
+  useHiddenTestSignal: 1
+  hiddenTestTargetFrequency: 94.3
+  hiddenTestProximityRange: 0.5
+  hiddenTestExactTolerance: 0.05
 --- !u!1 &2113609582
 GameObject:
   m_ObjectHideFlags: 0
@@ -7799,6 +7811,9 @@ PrefabInstance:
     - {fileID: 1779394299228565530, guid: 6ce39c23e2b608c4286d2284ea1d8ed6, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6410029089503858477, guid: 6ce39c23e2b608c4286d2284ea1d8ed6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
     - targetCorrespondingSourceObject: {fileID: 4790728000289642573, guid: 6ce39c23e2b608c4286d2284ea1d8ed6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 0}
@@ -7808,10 +7823,22 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1389192910082127812, guid: 6ce39c23e2b608c4286d2284ea1d8ed6, type: 3}
       insertIndex: -1
       addedObject: {fileID: 0}
-    - targetCorrespondingSourceObject: {fileID: 6410029089503858477, guid: 6ce39c23e2b608c4286d2284ea1d8ed6, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 6ce39c23e2b608c4286d2284ea1d8ed6, type: 3}
+--- !u!82 &952516016314871494 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 2446305667902255669, guid: 6ce39c23e2b608c4286d2284ea1d8ed6, type: 3}
+  m_PrefabInstance: {fileID: 952516016314871493}
+  m_PrefabAsset: {fileID: 0}
+--- !u!82 &952516016314871495 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 5793348403362278267, guid: 6ce39c23e2b608c4286d2284ea1d8ed6, type: 3}
+  m_PrefabInstance: {fileID: 952516016314871493}
+  m_PrefabAsset: {fileID: 0}
+--- !u!82 &952516016314871496 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 8026736892114348009, guid: 6ce39c23e2b608c4286d2284ea1d8ed6, type: 3}
+  m_PrefabInstance: {fileID: 952516016314871493}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2379444603063701233
 PrefabInstance:
   m_ObjectHideFlags: 0

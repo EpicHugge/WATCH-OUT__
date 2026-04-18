@@ -63,7 +63,22 @@ public sealed class ProgressionInteractablePhaseGate : MonoBehaviour
         }
 
         bool isAllowed = allowedPhases != null && allowedPhases.Contains(progressionManager.CurrentPhase);
+
+        // Keep the sleep bed available once the nightly power-out has happened,
+        // even if debug flow timing lands the manager in a transient state.
+        if (!isAllowed &&
+            targetInteractable is SleepBedInteractable &&
+            progressionManager.PowerOutTriggeredToday)
+        {
+            isAllowed = true;
+        }
+
         targetInteractable.SetLocked(!isAllowed);
+    }
+
+    public void RefreshLockState()
+    {
+        ApplyLockState();
     }
 
     private void OnValidate()

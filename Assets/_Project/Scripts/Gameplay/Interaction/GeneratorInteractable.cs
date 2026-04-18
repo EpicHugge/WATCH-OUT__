@@ -6,6 +6,7 @@ using System;
 public sealed class GeneratorInteractable : InteractableBase
 {
     [Header("Generator")]
+    [SerializeField] private ProgressionManager progressionManager;
     [SerializeField] private bool startsOn;
     [SerializeField] private string turnOnPrompt = "Turn On Generator";
     [SerializeField] private string turnOffPrompt = "Turn Off Generator";
@@ -34,11 +35,33 @@ public sealed class GeneratorInteractable : InteractableBase
     protected override void Awake()
     {
         base.Awake();
+        ResolveReferences();
         offLeverRotation = Quaternion.Euler(offLeverLocalEulerAngles);
         onLeverRotation = Quaternion.Euler(onLeverLocalEulerAngles);
         isOn = startsOn;
         ApplyVisualState();
         ApplyLeverStateImmediate();
+        RefreshAvailabilityState();
+    }
+
+    private void OnEnable()
+    {
+        ResolveReferences();
+
+        if (progressionManager != null)
+        {
+            progressionManager.StateChanged += HandleProgressionStateChanged;
+        }
+
+        RefreshAvailabilityState();
+    }
+
+    private void OnDisable()
+    {
+        if (progressionManager != null)
+        {
+            progressionManager.StateChanged -= HandleProgressionStateChanged;
+        }
     }
 
     private void Update()
@@ -89,7 +112,33 @@ public sealed class GeneratorInteractable : InteractableBase
         }
 
         StateChanged?.Invoke(isOn);
+        RefreshAvailabilityState();
         return true;
+    }
+
+    private void ResolveReferences()
+    {
+        if (progressionManager == null)
+        {
+            progressionManager = FindAnyObjectByType<ProgressionManager>();
+        }
+    }
+
+    private void HandleProgressionStateChanged()
+    {
+        RefreshAvailabilityState();
+    }
+
+    private void RefreshAvailabilityState()
+    {
+        if (progressionManager == null)
+        {
+            return;
+        }
+
+        bool canTurnOnNow = progressionManager.CurrentPhase == DayPhase.NeedGenerator &&
+            !progressionManager.PowerOutTriggeredToday;
+        SetLocked(!isOn && !canTurnOnNow);
     }
 
     private void ApplyVisualState()

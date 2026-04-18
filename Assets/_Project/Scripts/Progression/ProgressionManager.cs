@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 [DisallowMultipleComponent]
 public sealed class ProgressionManager : MonoBehaviour
@@ -27,6 +30,9 @@ public sealed class ProgressionManager : MonoBehaviour
     [SerializeField] private bool allowRadioDebugWithoutCassette = true;
     [SerializeField] private bool repeatSameRadioLoopEveryNightInTestBuild = true;
     [SerializeField] private bool powerDownGeneratorAndRadioAfterDialogueInTestBuild = true;
+    [SerializeField] private bool enableDebugInstantPowerKey = true;
+    [SerializeField] private KeyCode debugInstantPowerKey = KeyCode.F8;
+    [SerializeField] private GeneratorInteractable debugGeneratorInteractable;
     [SerializeField] [Min(1)] private int debugSetDay = 1;
     [SerializeField] private DayPhase debugSetPhase = DayPhase.NeedGenerator;
     [SerializeField] private CassetteData debugTestCassette;
@@ -41,6 +47,7 @@ public sealed class ProgressionManager : MonoBehaviour
     private bool generatorStartedToday;
     private bool powerOutTriggeredToday;
     private CassetteData selectedCassetteToday;
+    private bool cassettePlaybackStartedToday;
     private float radioScanElapsedSeconds;
 
     public event Action StateChanged;
@@ -50,6 +57,7 @@ public sealed class ProgressionManager : MonoBehaviour
     public bool GeneratorStartedToday => generatorStartedToday;
     public bool PowerOutTriggeredToday => powerOutTriggeredToday;
     public CassetteData SelectedCassetteToday => selectedCassetteToday;
+    public bool CassettePlaybackStartedToday => cassettePlaybackStartedToday;
     public DayData CurrentDayData => GetDayData(currentDay);
     public float RadioScanElapsedSeconds => radioScanElapsedSeconds;
     public IReadOnlyList<RadioEventData> ActiveRadioEventsToday => activeRadioEventsToday;
@@ -58,6 +66,10 @@ public sealed class ProgressionManager : MonoBehaviour
     public bool RepeatSameRadioLoopEveryNightInTestBuild => repeatSameRadioLoopEveryNightInTestBuild;
     public bool PowerDownGeneratorAndRadioAfterDialogueInTestBuild => powerDownGeneratorAndRadioAfterDialogueInTestBuild;
     public bool DeferPowerOutUntilDialogueEndsInTestBuild => powerDownGeneratorAndRadioAfterDialogueInTestBuild;
+    public bool CanUseRadioControls =>
+        !powerOutTriggeredToday &&
+        generatorStartedToday &&
+        (allowRadioDebugWithoutCassette || (selectedCassetteToday != null && cassettePlaybackStartedToday));
     public int DebugSetDay { get => debugSetDay; set => debugSetDay = Mathf.Max(1, value); }
     public DayPhase DebugSetPhase { get => debugSetPhase; set => debugSetPhase = value; }
     public CassetteData DebugTestCassette { get => debugTestCassette; set => debugTestCassette = value; }
@@ -85,6 +97,8 @@ public sealed class ProgressionManager : MonoBehaviour
 
     private void Update()
     {
+        HandleDebugInput();
+
         if (!Application.isPlaying || powerOutTriggeredToday || currentPhase != DayPhase.ScanningRadio)
         {
             return;
@@ -116,6 +130,7 @@ public sealed class ProgressionManager : MonoBehaviour
         generatorStartedToday = false;
         powerOutTriggeredToday = false;
         selectedCassetteToday = null;
+        cassettePlaybackStartedToday = false;
         radioScanElapsedSeconds = 0f;
         activeRadioEventsToday.Clear();
         resolvedRadioEventsToday.Clear();
@@ -179,8 +194,26 @@ public sealed class ProgressionManager : MonoBehaviour
         }
 
         selectedCassetteToday = cassette;
+        cassettePlaybackStartedToday = false;
         RefreshActiveRadioEvents();
         SetPhaseInternal(DayPhase.NeedCassette);
+        NotifyStateChanged();
+        return true;
+    }
+
+    public bool MarkCassettePlaybackStarted(CassetteData cassette)
+    {
+        if (cassette == null || selectedCassetteToday != cassette)
+        {
+            return false;
+        }
+
+        if (cassettePlaybackStartedToday)
+        {
+            return true;
+        }
+
+        cassettePlaybackStartedToday = true;
         NotifyStateChanged();
         return true;
     }
@@ -198,9 +231,9 @@ public sealed class ProgressionManager : MonoBehaviour
             return false;
         }
 
-        if (selectedCassetteToday == null && !allowRadioDebugWithoutCassette)
+        if (!CanUseRadioControls)
         {
-            Debug.LogWarning("Radio scan cannot begin before a cassette has been selected.", this);
+            Debug.LogWarning("Radio scan cannot begin before the selected cassette has been loaded and started.", this);
             return false;
         }
 
@@ -333,6 +366,27 @@ public sealed class ProgressionManager : MonoBehaviour
     {
         TriggerPowerOut();
         EndDay();
+        RefreshSleepAvailability();
+    }
+
+    public void DebugForceStartPower()
+    {
+        ResolveReferences();
+
+        if (debugGeneratorInteractable != null)
+        {
+            debugGeneratorInteractable.SetPowerState(true);
+        }
+        else
+        {
+            GeneratorInteractable[] generators = FindObjectsByType<GeneratorInteractable>(FindObjectsSortMode.None);
+            for (int i = 0; i < generators.Length; i++)
+            {
+                generators[i].SetPowerState(true);
+            }
+        }
+
+        StartGenerator();
     }
 
     public void AdvanceToNextDay()
@@ -415,6 +469,7 @@ public sealed class ProgressionManager : MonoBehaviour
         builder.AppendLine($"Generator Started: {generatorStartedToday}");
         builder.AppendLine($"Power Out Triggered: {powerOutTriggeredToday}");
         builder.AppendLine($"Selected Cassette: {(selectedCassetteToday != null ? selectedCassetteToday.CassetteName : "None")}");
+        builder.AppendLine($"Cassette Playback Started: {(cassettePlaybackStartedToday ? "Yes" : "No")}");
         builder.AppendLine($"Current Day Asset: {(CurrentDayData != null ? CurrentDayData.name : "Missing")}");
         builder.AppendLine($"Active Radio Events: {BuildNameList(activeRadioEventsToday)}");
         builder.AppendLine($"Resolved Radio Events: {BuildNameList(resolvedRadioEventsToday)}");
@@ -433,6 +488,11 @@ public sealed class ProgressionManager : MonoBehaviour
         if (dialogueRunner == null)
         {
             dialogueRunner = FindAnyObjectByType<DialogueRunner>();
+        }
+
+        if (debugGeneratorInteractable == null)
+        {
+            debugGeneratorInteractable = FindAnyObjectByType<GeneratorInteractable>();
         }
     }
 
@@ -555,6 +615,92 @@ public sealed class ProgressionManager : MonoBehaviour
     private void NotifyStateChanged()
     {
         StateChanged?.Invoke();
+    }
+
+    private void HandleDebugInput()
+    {
+        if (!Application.isPlaying || !WasDebugInstantPowerKeyPressed())
+        {
+            return;
+        }
+
+        DebugForceStartPower();
+    }
+
+    private bool WasDebugInstantPowerKeyPressed()
+    {
+        KeyCode effectiveDebugKey = debugInstantPowerKey == KeyCode.None
+            ? KeyCode.F8
+            : debugInstantPowerKey;
+
+        if (enableDebugInstantPowerKey && Input.GetKeyDown(effectiveDebugKey))
+        {
+            return true;
+        }
+
+        if (Input.GetKeyDown(KeyCode.F8))
+        {
+            return true;
+        }
+
+#if ENABLE_INPUT_SYSTEM
+        Keyboard keyboard = Keyboard.current;
+        if (keyboard == null)
+        {
+            return false;
+        }
+
+        if (keyboard.f8Key.wasPressedThisFrame)
+        {
+            return true;
+        }
+
+        if (!enableDebugInstantPowerKey)
+        {
+            return false;
+        }
+
+        return effectiveDebugKey switch
+        {
+            KeyCode.F1 => keyboard.f1Key.wasPressedThisFrame,
+            KeyCode.F2 => keyboard.f2Key.wasPressedThisFrame,
+            KeyCode.F3 => keyboard.f3Key.wasPressedThisFrame,
+            KeyCode.F4 => keyboard.f4Key.wasPressedThisFrame,
+            KeyCode.F5 => keyboard.f5Key.wasPressedThisFrame,
+            KeyCode.F6 => keyboard.f6Key.wasPressedThisFrame,
+            KeyCode.F7 => keyboard.f7Key.wasPressedThisFrame,
+            KeyCode.F8 => keyboard.f8Key.wasPressedThisFrame,
+            KeyCode.F9 => keyboard.f9Key.wasPressedThisFrame,
+            KeyCode.F10 => keyboard.f10Key.wasPressedThisFrame,
+            KeyCode.F11 => keyboard.f11Key.wasPressedThisFrame,
+            KeyCode.F12 => keyboard.f12Key.wasPressedThisFrame,
+            KeyCode.G => keyboard.gKey.wasPressedThisFrame,
+            KeyCode.P => keyboard.pKey.wasPressedThisFrame,
+            _ => false
+        };
+#else
+        return false;
+#endif
+    }
+
+    private void RefreshSleepAvailability()
+    {
+        ProgressionInteractablePhaseGate[] gates = FindObjectsByType<ProgressionInteractablePhaseGate>(FindObjectsSortMode.None);
+        for (int i = 0; i < gates.Length; i++)
+        {
+            gates[i].RefreshLockState();
+        }
+
+        if (!powerOutTriggeredToday)
+        {
+            return;
+        }
+
+        SleepBedInteractable[] sleepBeds = FindObjectsByType<SleepBedInteractable>(FindObjectsSortMode.None);
+        for (int i = 0; i < sleepBeds.Length; i++)
+        {
+            sleepBeds[i].SetLocked(false);
+        }
     }
 
     private static string BuildNameList(IReadOnlyList<RadioEventData> radioEvents)

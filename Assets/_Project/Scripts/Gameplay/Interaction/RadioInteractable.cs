@@ -6,9 +6,37 @@ public sealed class RadioInteractable : InteractableBase
 {
     [Header("Radio")]
     [SerializeField] private RadioSystem radioSystem;
+    [SerializeField] private ProgressionManager progressionManager;
     [SerializeField] private bool isIncreaseButton = true;
     [SerializeField] private bool isScanButton;
     [SerializeField] private string prompt = "Tune Up";
+
+    protected override void Awake()
+    {
+        base.Awake();
+        ResolveReferences();
+        RefreshLockState();
+    }
+
+    private void OnEnable()
+    {
+        ResolveReferences();
+
+        if (progressionManager != null)
+        {
+            progressionManager.StateChanged += RefreshLockState;
+        }
+
+        RefreshLockState();
+    }
+
+    private void OnDisable()
+    {
+        if (progressionManager != null)
+        {
+            progressionManager.StateChanged -= RefreshLockState;
+        }
+    }
 
     public override string GetInteractionPrompt(PlayerInteractionController interactor)
     {
@@ -64,5 +92,23 @@ public sealed class RadioInteractable : InteractableBase
         {
             radioSystem.SetDecreasing(false);
         }
+    }
+
+    private void ResolveReferences()
+    {
+        if (progressionManager == null)
+        {
+            progressionManager = FindAnyObjectByType<ProgressionManager>();
+        }
+    }
+
+    private void RefreshLockState()
+    {
+        if (progressionManager == null)
+        {
+            return;
+        }
+
+        SetLocked(!progressionManager.CanUseRadioControls);
     }
 }

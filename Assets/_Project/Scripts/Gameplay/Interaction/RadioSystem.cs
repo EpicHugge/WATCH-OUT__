@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using TMPro;
+using UnityEngine.Serialization;
 
 namespace WatchOut
 {
@@ -20,16 +21,25 @@ namespace WatchOut
 
         [Header("Audio")]
         [SerializeField] private AudioSource staticAudioSource;
-        [SerializeField] private AudioSource broadcastAudioSource;
         [SerializeField] private float maxStaticVolume = 0.5f;
-        [SerializeField] private float maxBroadcastVolume = 1f;
+        [FormerlySerializedAs("broadcastAudioSource")]
+        [SerializeField] private AudioSource nearSignalAudioSource;
+        [SerializeField] private AudioSource exactLockAudioSource;
+        [SerializeField] private AudioClip staticLoopClip;
+        [SerializeField] private AudioClip nearSignalLoopClip;
+        [SerializeField] private AudioClip exactLockClip;
+        [FormerlySerializedAs("maxBroadcastVolume")]
+        [SerializeField] private float maxNearSignalVolume = 1f;
+        [SerializeField] [Range(0f, 1f)] private float dialogueAudioDuckMultiplier = 0.05f;
 
         [Header("Tuning Settings")]
         [SerializeField] private float minFrequency = 87.5f;
         [SerializeField] private float maxFrequency = 108.0f;
         [SerializeField] private float frequencyStep = 0.1f;
         [SerializeField] private float continuousChangeSpeed = 10f;
+        [SerializeField] private float maxContinuousChangeSpeed = 20f;
         [SerializeField] private float holdDelay = 0.5f;
+        [SerializeField] private float holdAccelerationDuration = 1.25f;
         [SerializeField] private float autoScanSpeed = 2.0f;
         
         [Header("Signal Events")]
@@ -38,11 +48,18 @@ namespace WatchOut
         [Tooltip("Distance from target frequency where the channel is locked and dialogue plays.")]
         [SerializeField] private float signalLockTolerance = 0.05f;
 
+        [Header("Hidden Test Signal")]
+        [SerializeField] private bool useHiddenTestSignal;
+        [SerializeField] private float hiddenTestTargetFrequency = 94.3f;
+        [SerializeField] [Min(0.01f)] private float hiddenTestProximityRange = 0.5f;
+        [SerializeField] [Min(0.001f)] private float hiddenTestExactTolerance = 0.05f;
+
         private float currentFrequency = 87.5f;
         private bool isIncreasing;
         private bool isDecreasing;
         private bool isAutoScanning;
         private bool manualSignalLockArmed;
+        private bool hiddenSignalLocked;
         private float holdTimer;
         private float changeTimer;
         private RadioEventData currentLockedEvent;
@@ -88,19 +105,7 @@ namespace WatchOut
         {
             ResolveReferences();
             UpdateDisplay();
-
-            if (staticAudioSource != null)
-            {
-                staticAudioSource.loop = true;
-                staticAudioSource.volume = maxStaticVolume;
-                if (!staticAudioSource.isPlaying) staticAudioSource.Play();
-            }
-
-            if (broadcastAudioSource != null)
-            {
-                broadcastAudioSource.loop = true;
-                broadcastAudioSource.volume = 0f;
-            }
+            ConfigureAudioSources();
 
             RefreshPowerState();
         }
@@ -125,7 +130,15 @@ namespace WatchOut
                 if (holdTimer >= holdDelay)
                 {
                     changeTimer += Time.deltaTime;
-                    float timePerStep = 1f / continuousChangeSpeed;
+                    float heldBeyondDelay = holdTimer - holdDelay;
+                    float accelerationProgress = holdAccelerationDuration <= 0f
+                        ? 1f
+                        : Mathf.Clamp01(heldBeyondDelay / holdAccelerationDuration);
+                    float currentChangeSpeed = Mathf.Lerp(
+                        continuousChangeSpeed,
+                        Mathf.Max(continuousChangeSpeed, maxContinuousChangeSpeed),
+                        accelerationProgress);
+                    float timePerStep = 1f / Mathf.Max(0.001f, currentChangeSpeed);
 
                     while (changeTimer >= timePerStep)
                     {
@@ -158,49 +171,66 @@ namespace WatchOut
 
         private void HandleAudioAndEvents()
         {
+            bool isDialogueRunning = dialogueRunner != null && dialogueRunner.IsRunning;
+            SyncStaticLoopPlayback(IsRadioPowered() && !isDialogueRunning);
+
             if (!IsRadioPowered())
             {
                 ResetSignalState();
                 return;
             }
 
-            if (progressionManager == null ||
-                !progressionManager.TryGetClosestRadioEvent(currentFrequency, true, out RadioEventData closestEvent, out float closestDistance))
+            if (!TryGetActiveSignal(out float targetFrequency, out float proximityRange, out float lockTolerance, out RadioEventData closestEvent))
             {
                 ResetSignalState();
                 return;
             }
 
-            // Smoothly crossfade static and broadcast audio when inside the fade range
-            if (closestDistance <= signalFadeRange)
+            float closestDistance = Mathf.Abs(targetFrequency - currentFrequency);
+
+            // Smoothly crossfade static and near-signal audio when inside the fade range.
+            if (closestDistance <= proximityRange)
             {
-                float signalStrength = 1f - (closestDistance / signalFadeRange);
+                float signalStrength = 1f - (closestDistance / proximityRange);
+                float nearSignalMultiplier = isDialogueRunning ? dialogueAudioDuckMultiplier : 1f;
                 
                 if (staticAudioSource != null)
                 {
-                    staticAudioSource.volume = Mathf.Lerp(maxStaticVolume, 0f, signalStrength);
+                    staticAudioSource.volume = isDialogueRunning
+                        ? 0f
+                        : Mathf.Lerp(maxStaticVolume, 0f, signalStrength);
                 }
 
-                if (broadcastAudioSource != null && closestEvent.BroadcastAudio != null)
+                if (nearSignalAudioSource != null)
                 {
-                    if (broadcastAudioSource.clip != closestEvent.BroadcastAudio)
+                    nearSignalAudioSource.volume = Mathf.Lerp(0f, maxNearSignalVolume, signalStrength) * nearSignalMultiplier;
+                }
+
+                bool manualExactMatch = closestDistance <= lockTolerance && manualSignalLockArmed && !isAutoScanning;
+
+                if (useHiddenTestSignal)
+                {
+                    if (manualExactMatch && !hiddenSignalLocked)
                     {
-                        broadcastAudioSource.clip = closestEvent.BroadcastAudio;
-                        if (!broadcastAudioSource.isPlaying) broadcastAudioSource.Play();
+                        TriggerHiddenTestSignalLock(lockTolerance);
                     }
-                    broadcastAudioSource.volume = Mathf.Lerp(0f, maxBroadcastVolume, signalStrength);
+                    else if (closestDistance > lockTolerance && hiddenSignalLocked)
+                    {
+                        hiddenSignalLocked = false;
+                    }
                 }
-
-                // Check for a solid lock to trigger dialogue
-                if (closestDistance <= signalLockTolerance &&
-                    currentLockedEvent != closestEvent &&
-                    manualSignalLockArmed)
+                else if (closestEvent != null)
                 {
-                    LockOnSignal(closestEvent);
-                }
-                else if (closestDistance > signalLockTolerance && currentLockedEvent == closestEvent)
-                {
-                    currentLockedEvent = null;
+                    if (closestDistance <= lockTolerance &&
+                        currentLockedEvent != closestEvent &&
+                        manualSignalLockArmed)
+                    {
+                        LockOnSignal(closestEvent);
+                    }
+                    else if (closestDistance > lockTolerance && currentLockedEvent == closestEvent)
+                    {
+                        currentLockedEvent = null;
+                    }
                 }
             }
             else
@@ -223,10 +253,17 @@ namespace WatchOut
             currentFrequency = radioEvent.TargetFrequency;
             UpdateDisplay();
 
+            if (exactLockAudioSource != null && exactLockClip != null)
+            {
+                exactLockAudioSource.PlayOneShot(exactLockClip);
+            }
+
             bool eventFoundNow = progressionManager == null || progressionManager.MarkRadioEventFound(radioEvent);
 
             if (eventFoundNow && radioEvent.DialogueConversation != null && dialogueRunner != null)
             {
+                SyncStaticLoopPlayback(false);
+                staticAudioSource.volume = 0f;
                 dialogueRunner.StartConversation(radioEvent.DialogueConversation);
             }
 
@@ -335,21 +372,29 @@ namespace WatchOut
                 ResetTuningState();
                 ResetSignalState();
             }
+
+            SyncStaticLoopPlayback(isPowered && (dialogueRunner == null || !dialogueRunner.IsRunning));
+
+            if (staticAudioSource != null)
+            {
+                staticAudioSource.volume = isPowered ? maxStaticVolume : 0f;
+            }
         }
 
         private void ResetSignalState()
         {
             if (staticAudioSource != null)
             {
-                staticAudioSource.volume = maxStaticVolume;
+                staticAudioSource.volume = IsRadioPowered() ? maxStaticVolume : 0f;
             }
 
-            if (broadcastAudioSource != null)
+            if (nearSignalAudioSource != null)
             {
-                broadcastAudioSource.volume = 0f;
+                nearSignalAudioSource.volume = 0f;
             }
 
             currentLockedEvent = null;
+            hiddenSignalLocked = false;
         }
 
         private void ResetTuningState()
@@ -360,6 +405,23 @@ namespace WatchOut
             manualSignalLockArmed = false;
             holdTimer = 0f;
             changeTimer = 0f;
+        }
+
+        private void ConfigureAudioSources()
+        {
+            staticAudioSource = EnsureLoopSource(staticAudioSource, "Radio Static", staticLoopClip);
+            nearSignalAudioSource = EnsureLoopSource(nearSignalAudioSource, "Radio Near Signal", nearSignalLoopClip);
+            exactLockAudioSource = EnsureOneShotSource(exactLockAudioSource, "Radio Lock Cue");
+
+            if (staticAudioSource != null)
+            {
+                staticAudioSource.volume = 0f;
+            }
+
+            if (nearSignalAudioSource != null)
+            {
+                nearSignalAudioSource.volume = 0f;
+            }
         }
 
         private void ResolveReferences()
@@ -421,6 +483,86 @@ namespace WatchOut
             RefreshPowerState();
         }
 
+        private bool TryGetActiveSignal(
+            out float targetFrequency,
+            out float proximityRange,
+            out float lockTolerance,
+            out RadioEventData closestEvent)
+        {
+            closestEvent = null;
+            targetFrequency = 0f;
+            proximityRange = Mathf.Max(signalFadeRange, 0.01f);
+            lockTolerance = Mathf.Max(signalLockTolerance, 0.001f);
+
+            if (currentLockedEvent != null && dialogueRunner != null && dialogueRunner.IsRunning)
+            {
+                closestEvent = currentLockedEvent;
+                targetFrequency = currentLockedEvent.TargetFrequency;
+                SetNearSignalClip(currentLockedEvent.BroadcastAudio != null
+                    ? currentLockedEvent.BroadcastAudio
+                    : nearSignalLoopClip);
+                return true;
+            }
+
+            if (progressionManager != null &&
+                progressionManager.TryGetClosestRadioEvent(currentFrequency, false, out closestEvent, out _))
+            {
+                targetFrequency = closestEvent.TargetFrequency;
+                SetNearSignalClip(closestEvent.BroadcastAudio != null ? closestEvent.BroadcastAudio : nearSignalLoopClip);
+                return true;
+            }
+
+            if (!useHiddenTestSignal)
+            {
+                return false;
+            }
+
+            targetFrequency = hiddenTestTargetFrequency;
+            proximityRange = Mathf.Max(hiddenTestProximityRange, 0.01f);
+            lockTolerance = Mathf.Max(hiddenTestExactTolerance, 0.001f);
+            SetNearSignalClip(nearSignalLoopClip);
+            return true;
+        }
+
+        private void SetNearSignalClip(AudioClip clip)
+        {
+            if (nearSignalAudioSource == null)
+            {
+                return;
+            }
+
+            if (nearSignalAudioSource.clip != clip)
+            {
+                nearSignalAudioSource.Stop();
+                nearSignalAudioSource.clip = clip;
+            }
+
+            if (clip != null && !nearSignalAudioSource.isPlaying)
+            {
+                nearSignalAudioSource.Play();
+            }
+
+            nearSignalAudioSource.volume = 0f;
+        }
+
+        private void TriggerHiddenTestSignalLock(float lockTolerance)
+        {
+            hiddenSignalLocked = true;
+            manualSignalLockArmed = false;
+
+            if (exactLockAudioSource != null && exactLockClip != null)
+            {
+                exactLockAudioSource.PlayOneShot(exactLockClip);
+            }
+
+            if (progressionManager != null &&
+                progressionManager.TryGetClosestRadioEvent(currentFrequency, true, out RadioEventData hiddenEvent, out float closestDistance) &&
+                closestDistance <= lockTolerance)
+            {
+                LockOnSignal(hiddenEvent);
+            }
+        }
+
         private void HandleDebugLoopCompletion(bool eventFoundNow)
         {
             if (!eventFoundNow ||
@@ -450,6 +592,77 @@ namespace WatchOut
             progressionManager.CompleteDebugRadioLoopAfterDialogue();
             generatorInteractable?.SetPowerState(false);
             RefreshPowerState();
+        }
+
+        private AudioSource EnsureLoopSource(AudioSource source, string childName, AudioClip clip)
+        {
+            if (source == null)
+            {
+                source = CreateChildAudioSource(childName);
+            }
+
+            if (source == null)
+            {
+                return null;
+            }
+
+            source.playOnAwake = false;
+            source.loop = true;
+            source.clip = clip;
+
+            return source;
+        }
+
+        private AudioSource EnsureOneShotSource(AudioSource source, string childName)
+        {
+            if (source == null)
+            {
+                source = CreateChildAudioSource(childName);
+            }
+
+            if (source == null)
+            {
+                return null;
+            }
+
+            source.playOnAwake = false;
+            source.loop = false;
+            return source;
+        }
+
+        private AudioSource CreateChildAudioSource(string childName)
+        {
+            GameObject child = new GameObject(childName);
+            child.transform.SetParent(transform, false);
+            return child.AddComponent<AudioSource>();
+        }
+
+        private void SyncStaticLoopPlayback(bool shouldPlay)
+        {
+            if (staticAudioSource == null)
+            {
+                return;
+            }
+
+            if (staticAudioSource.clip != staticLoopClip)
+            {
+                staticAudioSource.clip = staticLoopClip;
+            }
+
+            if (!shouldPlay || staticLoopClip == null)
+            {
+                if (staticAudioSource.isPlaying)
+                {
+                    staticAudioSource.Stop();
+                }
+
+                return;
+            }
+
+            if (!staticAudioSource.isPlaying)
+            {
+                staticAudioSource.Play();
+            }
         }
     }
 }
