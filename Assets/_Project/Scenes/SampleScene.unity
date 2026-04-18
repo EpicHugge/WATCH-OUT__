@@ -2086,21 +2086,37 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 583922376182374785, guid: 40de0645634a9e442a444b8bca854145, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.62116
+      objectReference: {fileID: 0}
+    - target: {fileID: 583922376182374785, guid: 40de0645634a9e442a444b8bca854145, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.486
+      objectReference: {fileID: 0}
+    - target: {fileID: 1327101594839796771, guid: 40de0645634a9e442a444b8bca854145, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.753
+      objectReference: {fileID: 0}
+    - target: {fileID: 1327101594839796771, guid: 40de0645634a9e442a444b8bca854145, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1.026
+      objectReference: {fileID: 0}
     - target: {fileID: 1607419250942982055, guid: 40de0645634a9e442a444b8bca854145, type: 3}
       propertyPath: m_Name
       value: PrototypeBed
       objectReference: {fileID: 0}
     - target: {fileID: 2275390050795789330, guid: 40de0645634a9e442a444b8bca854145, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.95
+      value: -4.031
       objectReference: {fileID: 0}
     - target: {fileID: 2275390050795789330, guid: 40de0645634a9e442a444b8bca854145, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.253
+      value: -0.196
       objectReference: {fileID: 0}
     - target: {fileID: 2275390050795789330, guid: 40de0645634a9e442a444b8bca854145, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 3.08
+      value: 3.204
       objectReference: {fileID: 0}
     - target: {fileID: 2275390050795789330, guid: 40de0645634a9e442a444b8bca854145, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2130,50 +2146,23 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2884679454454428295, guid: 40de0645634a9e442a444b8bca854145, type: 3}
+      propertyPath: progressionManager
+      value: 
+      objectReference: {fileID: 910000003}
+    - target: {fileID: 4595100171210647117, guid: 40de0645634a9e442a444b8bca854145, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.058
+      objectReference: {fileID: 0}
     - target: {fileID: 4595100171210647117, guid: 40de0645634a9e442a444b8bca854145, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.321
+      value: 0.642
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1607419250942982055, guid: 40de0645634a9e442a444b8bca854145, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1901002217}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 40de0645634a9e442a444b8bca854145, type: 3}
---- !u!1 &1901002216 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1607419250942982055, guid: 40de0645634a9e442a444b8bca854145, type: 3}
-  m_PrefabInstance: {fileID: 1901002215}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1901002217
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1901002216}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d9d2cde23721fc4dba9ca301478d70b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProgressionInteractablePhaseGate
-  progressionManager: {fileID: 910000003}
-  targetInteractable: {fileID: 1901002218}
-  unlockWhenManagerMissing: 1
-  allowedPhases: 0400000005000000
---- !u!114 &1901002218 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8364074423108407797, guid: 40de0645634a9e442a444b8bca854145, type: 3}
-  m_PrefabInstance: {fileID: 1901002215}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1901002216}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cf02b98be11293a40a94aa3e7a8a7ff5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SleepBedInteractable
 --- !u!1 &1969649131
 GameObject:
   m_ObjectHideFlags: 0
@@ -2406,6 +2395,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3363507205731958488, guid: 2e9360f7268f6014cb1e11e3873d68eb, type: 3}
+      propertyPath: debugSetPhase
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 3640567158149069554, guid: 2e9360f7268f6014cb1e11e3873d68eb, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
