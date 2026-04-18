@@ -8,13 +8,16 @@ public class RadioInteractionTrigger : MonoBehaviour
 {
     [SerializeField] private RadioSystem radioSystem;
     [SerializeField] public bool isIncreaseButton;
+    [SerializeField] public bool isScanButton;
 
     /// <summary>
     /// Call this method from your Interaction System when the button is pressed/clicked.
     /// </summary>
     public void OnPress()
     {
-        if (isIncreaseButton)
+        if (isScanButton)
+            radioSystem.ToggleScan();
+        else if (isIncreaseButton)
             radioSystem.SetIncreasing(true);
         else
             radioSystem.SetDecreasing(true);
@@ -25,6 +28,9 @@ public class RadioInteractionTrigger : MonoBehaviour
     /// </summary>
     public void OnRelease()
     {
+        if (isScanButton)
+            return;
+
         if (isIncreaseButton)
             radioSystem.SetIncreasing(false);
         else

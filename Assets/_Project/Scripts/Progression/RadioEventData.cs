@@ -8,6 +8,7 @@ public sealed class RadioEventData : ScriptableObject
     [SerializeField] private string eventName = "New Radio Event";
     [SerializeField] [Min(0f)] private float targetFrequency = 94.3f;
     [SerializeField] private DialogueConversation dialogueConversation;
+    [SerializeField] private AudioClip broadcastAudio;
 
     [Header("Availability")]
     [SerializeField] [Min(1)] private int minDay = 1;
@@ -21,6 +22,7 @@ public sealed class RadioEventData : ScriptableObject
     public string EventName => string.IsNullOrWhiteSpace(eventName) ? name : eventName.Trim();
     public float TargetFrequency => targetFrequency;
     public DialogueConversation DialogueConversation => dialogueConversation;
+    public AudioClip BroadcastAudio => broadcastAudio;
     public int MinDay => Mathf.Max(1, minDay);
     public int MaxDay => Mathf.Max(0, maxDay);
     public IReadOnlyList<CassetteData> AllowedCassettes => allowedCassettes;

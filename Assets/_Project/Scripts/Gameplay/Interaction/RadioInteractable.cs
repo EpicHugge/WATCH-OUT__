@@ -7,6 +7,7 @@ public sealed class RadioInteractable : InteractableBase
     [Header("Radio")]
     [SerializeField] private RadioSystem radioSystem;
     [SerializeField] private bool isIncreaseButton = true;
+    [SerializeField] private bool isScanButton;
     [SerializeField] private string prompt = "Tune Up";
 
     public override string GetInteractionPrompt(PlayerInteractionController interactor)
@@ -27,6 +28,12 @@ public sealed class RadioInteractable : InteractableBase
             return;
         }
 
+        if (isScanButton)
+        {
+            radioSystem.ToggleScan();
+            return;
+        }
+
         if (isIncreaseButton)
         {
             radioSystem.SetIncreasing(true);
@@ -40,6 +47,11 @@ public sealed class RadioInteractable : InteractableBase
     protected override void EndInteractInternal(PlayerInteractionController interactor)
     {
         if (radioSystem == null)
+        {
+            return;
+        }
+
+        if (isScanButton)
         {
             return;
         }
