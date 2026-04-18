@@ -193,7 +193,7 @@ GameObject:
   - component: {fileID: 6558642842392194894}
   - component: {fileID: 2580320573368471179}
   m_Layer: 0
-  m_Name: Meshy_Model
+  m_Name: CasetteShelf
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
