@@ -15,5 +15,6 @@ MonoBehaviour:
   speakerDisplayName: Test01
   defaultSpeakerNameColor: {r: 0.6226415, g: 0.07929868, b: 0.07929868, a: 1}
   defaultDialogueTextColor: {r: 0.62352943, g: 0.08235294, b: 0.08235294, a: 1}
+  defaultBorderColor: {r: 0.62352943, g: 0.08235294, b: 0.08235294, a: 0.82}
   defaultVoiceProfile: {fileID: 11400000, guid: f4633fb08c58ffb4eafa001c645f6a93, type: 2}
   defaultTextEffect: 0

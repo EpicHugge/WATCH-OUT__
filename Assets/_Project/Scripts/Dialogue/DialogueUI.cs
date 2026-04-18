@@ -58,6 +58,9 @@ public sealed class DialogueUI : MonoBehaviour
 
     public TMP_Text BodyText => bodyLabel;
 
+    private Color activeBorderColor;
+    private bool visualsInitialized;
+
     private void Awake()
     {
         EnsureSetup();
@@ -96,6 +99,8 @@ public sealed class DialogueUI : MonoBehaviour
         string speakerName = line != null ? line.SpeakerName : string.Empty;
         string dialogueText = processedText != null ? processedText.DisplayText : line != null ? line.DialogueText : string.Empty;
 
+        activeBorderColor = ResolveBorderColor(line);
+        ApplyStaticVisuals();
         speakerLabel.text = speakerName;
         speakerLabel.gameObject.SetActive(!string.IsNullOrWhiteSpace(speakerName));
         speakerLabel.color = line != null ? line.SpeakerNameColor : Color.white;
@@ -148,6 +153,13 @@ public sealed class DialogueUI : MonoBehaviour
         EnsureLabels(fillRect, speakerPlateRect);
         textAnimator = GetOrAddComponent<DialogueTextAnimator>(gameObject, textAnimator);
         textAnimator.SetTarget(bodyLabel);
+
+        if (!visualsInitialized)
+        {
+            activeBorderColor = borderColor;
+            visualsInitialized = true;
+        }
+
         ApplyStaticVisuals();
     }
 
@@ -336,9 +348,11 @@ public sealed class DialogueUI : MonoBehaviour
 
     private void ApplyStaticVisuals()
     {
+        panelBackground.color = activeBorderColor;
         panelFill.color = panelColor;
         speakerPlate.color = speakerPlateColor;
-        speakerDivider.color = MultiplyAlpha(borderColor, 0.7f);
+        speakerDivider.color = MultiplyAlpha(activeBorderColor, 0.7f);
+        distressOverlay.color = distressOverlayColor;
         continueLabel.color = continueTextColor;
         continueGlyph.color = continueGlyphColor;
     }
@@ -369,10 +383,15 @@ public sealed class DialogueUI : MonoBehaviour
             continueGlyph.rectTransform.anchoredPosition = Vector2.zero;
         }
 
-        panelBackground.color = MultiplyRgb(borderColor, borderIntensity);
+        panelBackground.color = MultiplyRgb(activeBorderColor, borderIntensity);
         distressOverlay.color = MultiplyAlpha(distressOverlayColor, overlayAlpha);
         continueLabel.color = continueLabel.gameObject.activeSelf ? MultiplyAlpha(continueTextColor, glyphPulse) : continueTextColor;
         continueGlyph.color = continueGlyph.gameObject.activeSelf ? MultiplyAlpha(continueGlyphColor, glyphPulse) : continueGlyphColor;
+    }
+
+    private Color ResolveBorderColor(DialogueLine line)
+    {
+        return line != null ? line.BorderColor : borderColor;
     }
 
     private Color ResolveDialogueTextColor(DialogueLine line)
