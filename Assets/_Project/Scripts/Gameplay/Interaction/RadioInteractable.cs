@@ -96,6 +96,16 @@ public sealed class RadioInteractable : InteractableBase
 
     private void ResolveReferences()
     {
+        if (radioSystem == null)
+        {
+            radioSystem = GetComponentInParent<RadioSystem>();
+
+            if (radioSystem == null)
+            {
+                radioSystem = FindAnyObjectByType<RadioSystem>();
+            }
+        }
+
         if (progressionManager == null)
         {
             progressionManager = FindAnyObjectByType<ProgressionManager>();

@@ -5,4 +5,5 @@
   <Project Path="RadicalForge.Blockout.Editor.csproj" />
   <Project Path="LineworkLite.Editor.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
+  <Project Path="MeshyAssembly.csproj" />
 </Solution>

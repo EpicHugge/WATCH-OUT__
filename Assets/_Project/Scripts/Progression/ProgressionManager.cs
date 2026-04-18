@@ -27,6 +27,7 @@ public sealed class ProgressionManager : MonoBehaviour
     [SerializeField] [Min(0.001f)] private float frequencyMatchTolerance = 0.05f;
 
     [Header("Debug")]
+    [SerializeField] private bool unlockAllInteractionsForDebug = true;
     [SerializeField] private bool allowRadioDebugWithoutCassette = true;
     [SerializeField] private bool repeatSameRadioLoopEveryNightInTestBuild = true;
     [SerializeField] private bool powerDownGeneratorAndRadioAfterDialogueInTestBuild = true;
@@ -66,7 +67,9 @@ public sealed class ProgressionManager : MonoBehaviour
     public bool RepeatSameRadioLoopEveryNightInTestBuild => repeatSameRadioLoopEveryNightInTestBuild;
     public bool PowerDownGeneratorAndRadioAfterDialogueInTestBuild => powerDownGeneratorAndRadioAfterDialogueInTestBuild;
     public bool DeferPowerOutUntilDialogueEndsInTestBuild => powerDownGeneratorAndRadioAfterDialogueInTestBuild;
+    public bool UnlockAllInteractionsForDebug => unlockAllInteractionsForDebug;
     public bool CanUseRadioControls =>
+        unlockAllInteractionsForDebug ||
         !powerOutTriggeredToday &&
         generatorStartedToday &&
         (allowRadioDebugWithoutCassette || (selectedCassetteToday != null && cassettePlaybackStartedToday));
@@ -165,7 +168,7 @@ public sealed class ProgressionManager : MonoBehaviour
             return false;
         }
 
-        if (currentPhase == DayPhase.WakingUp)
+        if (unlockAllInteractionsForDebug || currentPhase == DayPhase.WakingUp)
         {
             CompleteWakeUp();
         }
@@ -185,7 +188,9 @@ public sealed class ProgressionManager : MonoBehaviour
         }
 
         DayData dayData = CurrentDayData;
-        if (dayData != null && !dayData.ContainsCassette(cassette))
+        if (!unlockAllInteractionsForDebug &&
+            dayData != null &&
+            !dayData.ContainsCassette(cassette))
         {
             Debug.LogWarning(
                 $"Cassette '{cassette.CassetteName}' is not assigned to day {currentDay}. Selection was ignored.",
@@ -225,13 +230,13 @@ public sealed class ProgressionManager : MonoBehaviour
             return true;
         }
 
-        if (!generatorStartedToday)
+        if (!unlockAllInteractionsForDebug && !generatorStartedToday)
         {
             Debug.LogWarning("Radio scan cannot begin before the generator has started.", this);
             return false;
         }
 
-        if (!CanUseRadioControls)
+        if (!unlockAllInteractionsForDebug && !CanUseRadioControls)
         {
             Debug.LogWarning("Radio scan cannot begin before the selected cassette has been loaded and started.", this);
             return false;
@@ -277,7 +282,7 @@ public sealed class ProgressionManager : MonoBehaviour
         closestDistance = float.MaxValue;
 
         DayData dayData = CurrentDayData;
-        if (dayData == null || (!allowRadioDebugWithoutCassette && selectedCassetteToday == null))
+        if (dayData == null || (!unlockAllInteractionsForDebug && !allowRadioDebugWithoutCassette && selectedCassetteToday == null))
         {
             return false;
         }
@@ -501,7 +506,7 @@ public sealed class ProgressionManager : MonoBehaviour
         activeRadioEventsToday.Clear();
 
         DayData dayData = CurrentDayData;
-        if (dayData == null || (!allowRadioDebugWithoutCassette && selectedCassetteToday == null))
+        if (dayData == null || (!unlockAllInteractionsForDebug && !allowRadioDebugWithoutCassette && selectedCassetteToday == null))
         {
             return;
         }
@@ -547,10 +552,10 @@ public sealed class ProgressionManager : MonoBehaviour
 
         if (selectedCassetteToday == null)
         {
-            return allowRadioDebugWithoutCassette;
+            return unlockAllInteractionsForDebug || allowRadioDebugWithoutCassette;
         }
 
-        return radioEvent.AllowsCassette(selectedCassetteToday);
+        return unlockAllInteractionsForDebug || radioEvent.AllowsCassette(selectedCassetteToday);
     }
 
     private DayData GetDayData(int dayNumber)

@@ -95,7 +95,7 @@ public sealed class CassetteShelfItem : InteractableBase
             return;
         }
 
-        if (!cassettePlayerReceiver.TryLoadCassette(cassetteData))
+        if (!cassettePlayerReceiver.TrySelectCassette(cassetteData))
         {
             return;
         }
