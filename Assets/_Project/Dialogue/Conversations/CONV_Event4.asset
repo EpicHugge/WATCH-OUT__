@@ -12,14 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dff16ec057fa46547bab6b69ce347937, type: 3}
   m_Name: CONV_Event4
   m_EditorClassIdentifier: Assembly-CSharp::DialogueConversation
-  overrideRevealSpeed: 0
-  charactersPerSecond: 60
-  defaultVoiceProfile: {fileID: 0}
+  overrideRevealSpeed: 1
+  charactersPerSecond: 30
+  defaultVoiceProfile: {fileID: 11400000, guid: f4633fb08c58ffb4eafa001c645f6a93, type: 2}
   speakerVoices: []
   lines:
   - speakerPreset: {fileID: 0}
     speakerName: Event 4
-    dialogueText: This is the last message. Power down, stay quiet, and sleep until morning never comes.
+    dialogueText: This is the last message. Power down, stay quiet, and sleep until
+      morning never comes.
     overrideTextEffect: 0
     textEffect: 0
     overrideSpeakerNameColor: 0

@@ -167,11 +167,23 @@ namespace WatchOut
         private void HandleAudioAndEvents()
         {
             bool isDialogueRunning = dialogueRunner != null && dialogueRunner.IsRunning;
-            SyncStaticLoopPlayback(IsRadioPowered() && !isDialogueRunning);
+            if (isDialogueRunning)
+            {
+                MuteRadioAudio(stopExactLock: false);
+            }
+            else
+            {
+                SyncStaticLoopPlayback(IsRadioPowered());
+            }
 
             if (!IsRadioPowered())
             {
                 ResetSignalState();
+                return;
+            }
+
+            if (isDialogueRunning)
+            {
                 return;
             }
 
@@ -263,8 +275,7 @@ namespace WatchOut
             if (radioEvent.DialogueConversation != null && dialogueRunner != null)
             {
                 pendingResolvedEvent = radioEvent;
-                SyncStaticLoopPlayback(false);
-                staticAudioSource.volume = 0f;
+                MuteRadioAudio();
                 if (!dialogueRunner.StartConversation(radioEvent.DialogueConversation))
                 {
                     pendingResolvedEvent = null;
@@ -363,11 +374,18 @@ namespace WatchOut
                 ResetSignalState();
             }
 
-            SyncStaticLoopPlayback(isPowered && (dialogueRunner == null || !dialogueRunner.IsRunning));
-
-            if (staticAudioSource != null)
+            if (dialogueRunner != null && dialogueRunner.IsRunning)
             {
-                staticAudioSource.volume = isPowered ? maxStaticVolume : 0f;
+                MuteRadioAudio(stopExactLock: false);
+            }
+            else
+            {
+                SyncStaticLoopPlayback(isPowered);
+
+                if (staticAudioSource != null)
+                {
+                    staticAudioSource.volume = isPowered ? maxStaticVolume : 0f;
+                }
             }
         }
 
@@ -386,6 +404,27 @@ namespace WatchOut
 
             currentLockedEvent = null;
             hiddenSignalLocked = false;
+        }
+
+        private void MuteRadioAudio(bool stopExactLock = true)
+        {
+            SyncStaticLoopPlayback(false);
+            SyncNearSignalLoopPlayback(false);
+
+            if (staticAudioSource != null)
+            {
+                staticAudioSource.volume = 0f;
+            }
+
+            if (nearSignalAudioSource != null)
+            {
+                nearSignalAudioSource.volume = 0f;
+            }
+
+            if (stopExactLock && exactLockAudioSource != null)
+            {
+                exactLockAudioSource.Stop();
+            }
         }
 
         private void ResetTuningState()
@@ -598,6 +637,11 @@ namespace WatchOut
             LogLockMatchIfChanged();
         }
 
+        private void HandleDialogueStarted(DialogueConversation conversation)
+        {
+            MuteRadioAudio();
+        }
+
         private void StepFrequency(float delta, string inputSource, bool attemptManualLock, bool snapToStep)
         {
             currentFrequency = WrapFrequency(currentFrequency + delta);
@@ -683,6 +727,7 @@ namespace WatchOut
 
             if (subscribedDialogueRunner != null)
             {
+                subscribedDialogueRunner.ConversationStarted -= HandleDialogueStarted;
                 subscribedDialogueRunner.ConversationEnded -= HandleDialogueEnded;
                 subscribedDialogueRunner = null;
             }
@@ -706,6 +751,7 @@ namespace WatchOut
 
             if (dialogueRunner != null)
             {
+                dialogueRunner.ConversationStarted += HandleDialogueStarted;
                 dialogueRunner.ConversationEnded += HandleDialogueEnded;
                 subscribedDialogueRunner = dialogueRunner;
             }

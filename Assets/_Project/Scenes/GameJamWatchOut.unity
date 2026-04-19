@@ -2960,7 +2960,7 @@ MonoBehaviour:
   voicePlayer: {fileID: 0}
   cameraShake: {fileID: 0}
   keyboardAdvanceKey: 19
-  keyboardAlternateAdvanceKey: 0
+  keyboardAlternateAdvanceKey: 1
   gamepadAdvanceButton: 6
   charactersPerSecond: 60
 --- !u!114 &2091946578

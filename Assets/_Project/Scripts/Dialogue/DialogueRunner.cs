@@ -7,8 +7,8 @@ using UnityEngine.InputSystem.LowLevel;
 [DisallowMultipleComponent]
 public sealed class DialogueRunner : MonoBehaviour
 {
-    private const string ContinuePromptText = "Continue [E / X]";
-    private const string EndConversationPromptText = "End Conversation [E / X]";
+    private const string ContinuePromptText = "Continue [E / Space / Square / X]";
+    private const string EndConversationPromptText = "End Conversation [E / Space / Square / X]";
 
     [Header("References")]
     [SerializeField] private PlayerInput playerInput;
@@ -21,7 +21,7 @@ public sealed class DialogueRunner : MonoBehaviour
 
     [Header("Input")]
     [SerializeField] private Key keyboardAdvanceKey = Key.E;
-    [SerializeField] private Key keyboardAlternateAdvanceKey = Key.None;
+    [SerializeField] private Key keyboardAlternateAdvanceKey = Key.Space;
     [SerializeField] private GamepadButton gamepadAdvanceButton = GamepadButton.South;
 
     [Header("Reveal")]
@@ -318,7 +318,9 @@ public sealed class DialogueRunner : MonoBehaviour
             }
         }
 
-        return Gamepad.current != null && Gamepad.current[gamepadAdvanceButton].wasPressedThisFrame;
+        return Gamepad.current != null &&
+               (Gamepad.current[gamepadAdvanceButton].wasPressedThisFrame ||
+                Gamepad.current[GamepadButton.West].wasPressedThisFrame);
     }
 
     private bool IsAdvanceHeld()
@@ -338,7 +340,9 @@ public sealed class DialogueRunner : MonoBehaviour
             }
         }
 
-        return Gamepad.current != null && Gamepad.current[gamepadAdvanceButton].isPressed;
+        return Gamepad.current != null &&
+               (Gamepad.current[gamepadAdvanceButton].isPressed ||
+                Gamepad.current[GamepadButton.West].isPressed);
     }
 
     private DialogueLine GetCurrentLine()

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5b6a78bc3ae9c54da05d490e3791ac9, type: 3}
   m_Name: CAS_Cassette1
   m_EditorClassIdentifier: Assembly-CSharp::CassetteData
-  cassetteName: Cassette 1
+  cassetteName: Watch Out
   description: First playable cassette for the jam flow.
   broadcastConversation: {fileID: 11400000, guid: 1a2c0bb4dac2464bb24bdc99f1e1aa60, type: 2}
   category: Game Jam

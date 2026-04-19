@@ -14,14 +14,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueConversation
   overrideRevealSpeed: 0
   charactersPerSecond: 60
-  defaultVoiceProfile: {fileID: 0}
+  defaultVoiceProfile: {fileID: 11400000, guid: f4633fb08c58ffb4eafa001c645f6a93, type: 2}
   speakerVoices:
   - speakerName: Test
     voiceProfile: {fileID: 11400000, guid: f4633fb08c58ffb4eafa001c645f6a93, type: 2}
   lines:
   - speakerPreset: {fileID: 0}
     speakerName: Event 1
-    dialogueText: If you can hear this, answer on the next band. I only have a moment.
+    dialogueText: ...
     overrideTextEffect: 0
     textEffect: 0
     overrideSpeakerNameColor: 0

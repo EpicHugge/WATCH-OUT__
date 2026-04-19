@@ -1902,6 +1902,14 @@ PrefabInstance:
       propertyPath: continueGlyphColor.r
       value: 0.10524208
       objectReference: {fileID: 0}
+    - target: {fileID: 353150271718765138, guid: a421970b3ad783e4282f306061810f9b, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    - target: {fileID: 353150271718765138, guid: a421970b3ad783e4282f306061810f9b, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
     - target: {fileID: 424256569369922828, guid: a421970b3ad783e4282f306061810f9b, type: 3}
       propertyPath: m_fontAsset
       value: 
@@ -1921,6 +1929,18 @@ PrefabInstance:
     - target: {fileID: 1907615253950967449, guid: a421970b3ad783e4282f306061810f9b, type: 3}
       propertyPath: jumpEnabled
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2811409251394555398, guid: a421970b3ad783e4282f306061810f9b, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    - target: {fileID: 2811409251394555398, guid: a421970b3ad783e4282f306061810f9b, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    - target: {fileID: 2811409251394555398, guid: a421970b3ad783e4282f306061810f9b, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
       objectReference: {fileID: 0}
     - target: {fileID: 2892951233053638183, guid: a421970b3ad783e4282f306061810f9b, type: 3}
       propertyPath: m_fontAsset
@@ -1970,6 +1990,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4659954188450900722, guid: a421970b3ad783e4282f306061810f9b, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    - target: {fileID: 4659954188450900722, guid: a421970b3ad783e4282f306061810f9b, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    - target: {fileID: 4659954188450900722, guid: a421970b3ad783e4282f306061810f9b, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 3958107115
+      objectReference: {fileID: 0}
+    - target: {fileID: 4659954188450900722, guid: a421970b3ad783e4282f306061810f9b, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
     - target: {fileID: 4877345440382148972, guid: a421970b3ad783e4282f306061810f9b, type: 3}
       propertyPath: radius
       value: 7
@@ -2010,6 +2046,26 @@ PrefabInstance:
       propertyPath: m_sharedMaterial
       value: 
       objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    - target: {fileID: 6702811251589695437, guid: a421970b3ad783e4282f306061810f9b, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    - target: {fileID: 6702811251589695437, guid: a421970b3ad783e4282f306061810f9b, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    - target: {fileID: 6702811251589695437, guid: a421970b3ad783e4282f306061810f9b, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4293651435
+      objectReference: {fileID: 0}
+    - target: {fileID: 6702811251589695437, guid: a421970b3ad783e4282f306061810f9b, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 8392545459228688574, guid: a421970b3ad783e4282f306061810f9b, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
     - target: {fileID: 8852129451952701189, guid: a421970b3ad783e4282f306061810f9b, type: 3}
       propertyPath: m_fontAsset
       value: 
@@ -2080,7 +2136,7 @@ MonoBehaviour:
   voicePlayer: {fileID: 0}
   cameraShake: {fileID: 0}
   keyboardAdvanceKey: 19
-  keyboardAlternateAdvanceKey: 0
+  keyboardAlternateAdvanceKey: 1
   gamepadAdvanceButton: 6
   charactersPerSecond: 60
 --- !u!1 &1746520726
@@ -2992,6 +3048,10 @@ PrefabInstance:
     - target: {fileID: 5727493093223521778, guid: 5d511aace7f05aa438e1bd36e391d8c3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: -180
+      objectReference: {fileID: 0}
+    - target: {fileID: 8437371872503378569, guid: 5d511aace7f05aa438e1bd36e391d8c3, type: 3}
+      propertyPath: prompt
+      value: Pick Watch Out
       objectReference: {fileID: 0}
     - target: {fileID: 8514839434243645266, guid: 5d511aace7f05aa438e1bd36e391d8c3, type: 3}
       propertyPath: slotMode

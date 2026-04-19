@@ -37,6 +37,7 @@ public sealed class FirstPersonPlayerController : MonoBehaviour
 
     private CharacterController characterController;
     private PlayerInput playerInput;
+    private PlayerInteractionController interactionController;
     private InputAction moveAction;
     private InputAction lookAction;
     private InputAction jumpAction;
@@ -59,6 +60,7 @@ public sealed class FirstPersonPlayerController : MonoBehaviour
     {
         characterController = GetComponent<CharacterController>();
         playerInput = GetComponent<PlayerInput>();
+        interactionController = GetComponent<PlayerInteractionController>();
 
         if (cameraPivot == null)
         {
@@ -73,6 +75,11 @@ public sealed class FirstPersonPlayerController : MonoBehaviour
         if (GetComponent<PlayerInteractionController>() == null)
         {
             gameObject.AddComponent<PlayerInteractionController>();
+        }
+
+        if (interactionController == null)
+        {
+            interactionController = GetComponent<PlayerInteractionController>();
         }
 
         if (GetComponent<DialogueRunner>() == null)
@@ -157,7 +164,11 @@ public sealed class FirstPersonPlayerController : MonoBehaviour
             verticalVelocity = groundedGravity;
         }
 
-        if (jumpEnabled && jumpAction != null && jumpAction.WasPressedThisFrame() && characterController.isGrounded)
+        if (jumpEnabled &&
+            jumpAction != null &&
+            jumpAction.WasPressedThisFrame() &&
+            characterController.isGrounded &&
+            !ShouldSuppressJumpThisFrame())
         {
             verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
         }
@@ -361,6 +372,14 @@ public sealed class FirstPersonPlayerController : MonoBehaviour
 
             jumpAction.ApplyBindingOverride(i, new InputBinding { overridePath = GetKeyboardBindingPath(keyboardJumpKey) });
         }
+    }
+
+    private bool ShouldSuppressJumpThisFrame()
+    {
+        return playerInput != null &&
+               playerInput.currentControlScheme == "Gamepad" &&
+               interactionController != null &&
+               interactionController.CurrentTarget != null;
     }
 
     private static string GetKeyboardBindingPath(Key key)

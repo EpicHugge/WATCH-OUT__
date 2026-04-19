@@ -12,14 +12,223 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dff16ec057fa46547bab6b69ce347937, type: 3}
   m_Name: CONV_Cassette1
   m_EditorClassIdentifier: Assembly-CSharp::DialogueConversation
-  overrideRevealSpeed: 0
-  charactersPerSecond: 60
-  defaultVoiceProfile: {fileID: 0}
-  speakerVoices: []
+  overrideRevealSpeed: 1
+  charactersPerSecond: 30
+  defaultVoiceProfile: {fileID: 11400000, guid: f4633fb08c58ffb4eafa001c645f6a93, type: 2}
+  speakerVoices:
+  - speakerName: 
+    voiceProfile: {fileID: 11400000, guid: f4633fb08c58ffb4eafa001c645f6a93, type: 2}
   lines:
   - speakerPreset: {fileID: 0}
-    speakerName: Cassette 1
-    dialogueText: Entry one. Generator stable. Keep listening for a voice on the radio.
+    speakerName: 
+    dialogueText: This is a recorded broadcast for anyone still out there.
+    overrideTextEffect: 0
+    textEffect: 0
+    overrideSpeakerNameColor: 0
+    speakerNameColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideDialogueTextColor: 0
+    dialogueTextColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideBorderColor: 0
+    borderColor: {r: 0.57, g: 0.67, b: 0.69, a: 0.82}
+    overrideRevealSpeed: 0
+    charactersPerSecond: 60
+    voiceProfileOverride: {fileID: 0}
+    lineEvent:
+      eventType: 0
+      triggerTiming: 0
+      duration: 0.2
+      magnitude: 0.08
+      frequency: 24
+    autoAdvance: 0
+    autoAdvanceDelay: 0.15
+  - speakerPreset: {fileID: 0}
+    speakerName: 
+    dialogueText: "If you\u2019re hearing this, then your radio still works, and
+      that already puts you ahead of most."
+    overrideTextEffect: 0
+    textEffect: 0
+    overrideSpeakerNameColor: 0
+    speakerNameColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideDialogueTextColor: 0
+    dialogueTextColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideBorderColor: 0
+    borderColor: {r: 0.57, g: 0.67, b: 0.69, a: 0.82}
+    overrideRevealSpeed: 0
+    charactersPerSecond: 60
+    voiceProfileOverride: {fileID: 0}
+    lineEvent:
+      eventType: 0
+      triggerTiming: 0
+      duration: 0.2
+      magnitude: 0.08
+      frequency: 24
+    autoAdvance: 0
+    autoAdvanceDelay: 0.15
+  - speakerPreset: {fileID: 0}
+    speakerName: 
+    dialogueText: "I\u2019ve been sending these messages for a long time now, and
+      I still keep the station open when I can."
+    overrideTextEffect: 0
+    textEffect: 0
+    overrideSpeakerNameColor: 0
+    speakerNameColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideDialogueTextColor: 0
+    dialogueTextColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideBorderColor: 0
+    borderColor: {r: 0.57, g: 0.67, b: 0.69, a: 0.82}
+    overrideRevealSpeed: 0
+    charactersPerSecond: 60
+    voiceProfileOverride: {fileID: 0}
+    lineEvent:
+      eventType: 0
+      triggerTiming: 0
+      duration: 0.2
+      magnitude: 0.08
+      frequency: 24
+    autoAdvance: 0
+    autoAdvanceDelay: 0.15
+  - speakerPreset: {fileID: 0}
+    speakerName: 
+    dialogueText: When everything changed, the clocks stopped, all at once, and most
+      of them have stayed dead ever since.
+    overrideTextEffect: 0
+    textEffect: 0
+    overrideSpeakerNameColor: 0
+    speakerNameColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideDialogueTextColor: 0
+    dialogueTextColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideBorderColor: 0
+    borderColor: {r: 0.57, g: 0.67, b: 0.69, a: 0.82}
+    overrideRevealSpeed: 0
+    charactersPerSecond: 60
+    voiceProfileOverride: {fileID: 0}
+    lineEvent:
+      eventType: 0
+      triggerTiming: 0
+      duration: 0.2
+      magnitude: 0.08
+      frequency: 24
+    autoAdvance: 0
+    autoAdvanceDelay: 0.15
+  - speakerPreset: {fileID: 0}
+    speakerName: 
+    dialogueText: "If you\u2019ve got a wristwatch, keep it on you, because when
+      it starts ticking, something is close."
+    overrideTextEffect: 0
+    textEffect: 0
+    overrideSpeakerNameColor: 0
+    speakerNameColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideDialogueTextColor: 0
+    dialogueTextColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideBorderColor: 0
+    borderColor: {r: 0.57, g: 0.67, b: 0.69, a: 0.82}
+    overrideRevealSpeed: 0
+    charactersPerSecond: 60
+    voiceProfileOverride: {fileID: 0}
+    lineEvent:
+      eventType: 0
+      triggerTiming: 0
+      duration: 0.2
+      magnitude: 0.08
+      frequency: 24
+    autoAdvance: 0
+    autoAdvanceDelay: 0.15
+  - speakerPreset: {fileID: 0}
+    speakerName: 
+    dialogueText: Clocks in houses, shops, and other buildings react too, but those
+      tell a different story.
+    overrideTextEffect: 0
+    textEffect: 0
+    overrideSpeakerNameColor: 0
+    speakerNameColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideDialogueTextColor: 0
+    dialogueTextColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideBorderColor: 0
+    borderColor: {r: 0.57, g: 0.67, b: 0.69, a: 0.82}
+    overrideRevealSpeed: 0
+    charactersPerSecond: 60
+    voiceProfileOverride: {fileID: 0}
+    lineEvent:
+      eventType: 0
+      triggerTiming: 0
+      duration: 0.2
+      magnitude: 0.08
+      frequency: 24
+    autoAdvance: 0
+    autoAdvanceDelay: 0.15
+  - speakerPreset: {fileID: 0}
+    speakerName: 
+    dialogueText: "Your watch tells you what\u2019s near you now, but a clock on
+      the wall tells you how much activity that place has seen."
+    overrideTextEffect: 0
+    textEffect: 0
+    overrideSpeakerNameColor: 0
+    speakerNameColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideDialogueTextColor: 0
+    dialogueTextColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideBorderColor: 0
+    borderColor: {r: 0.57, g: 0.67, b: 0.69, a: 0.82}
+    overrideRevealSpeed: 0
+    charactersPerSecond: 60
+    voiceProfileOverride: {fileID: 0}
+    lineEvent:
+      eventType: 0
+      triggerTiming: 0
+      duration: 0.2
+      magnitude: 0.08
+      frequency: 24
+    autoAdvance: 0
+    autoAdvanceDelay: 0.15
+  - speakerPreset: {fileID: 0}
+    speakerName: 
+    dialogueText: "The later it\u2019s moved from where it stopped, the more those
+      things have passed through."
+    overrideTextEffect: 0
+    textEffect: 0
+    overrideSpeakerNameColor: 0
+    speakerNameColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideDialogueTextColor: 0
+    dialogueTextColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideBorderColor: 0
+    borderColor: {r: 0.57, g: 0.67, b: 0.69, a: 0.82}
+    overrideRevealSpeed: 0
+    charactersPerSecond: 60
+    voiceProfileOverride: {fileID: 0}
+    lineEvent:
+      eventType: 0
+      triggerTiming: 0
+      duration: 0.2
+      magnitude: 0.08
+      frequency: 24
+    autoAdvance: 0
+    autoAdvanceDelay: 0.15
+  - speakerPreset: {fileID: 0}
+    speakerName: 
+    dialogueText: "So if you\u2019re looking for somewhere to loot, hide, or sleep,
+      check the clocks before you bet your life on that place."
+    overrideTextEffect: 0
+    textEffect: 0
+    overrideSpeakerNameColor: 0
+    speakerNameColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideDialogueTextColor: 0
+    dialogueTextColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideBorderColor: 0
+    borderColor: {r: 0.57, g: 0.67, b: 0.69, a: 0.82}
+    overrideRevealSpeed: 0
+    charactersPerSecond: 60
+    voiceProfileOverride: {fileID: 0}
+    lineEvent:
+      eventType: 0
+      triggerTiming: 0
+      duration: 0.2
+      magnitude: 0.08
+      frequency: 24
+    autoAdvance: 0
+    autoAdvanceDelay: 0.15
+  - speakerPreset: {fileID: 0}
+    speakerName: 
+    dialogueText: I keep this station live every night from 21:00 to 21:15, so if
+      you hear me calling, answer... and until then, watch out.
     overrideTextEffect: 0
     textEffect: 0
     overrideSpeakerNameColor: 0

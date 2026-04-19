@@ -855,7 +855,7 @@ public sealed class ProgressionManager : MonoBehaviour
         return currentObjectiveStep switch
         {
             GameJamObjectiveStep.WakeUp => $"Day {Mathf.Max(1, currentDay)}\nWake up",
-            GameJamObjectiveStep.StartGenerator => $"Day {Mathf.Max(1, currentDay)}\nStart the generator",
+            GameJamObjectiveStep.StartGenerator => $"Day {Mathf.Max(1, currentDay)}\nGo downstairs and start generator",
             GameJamObjectiveStep.PickCassette => $"Day {Mathf.Max(1, currentDay)}\nPick a cassette",
             GameJamObjectiveStep.PlayCassette => $"Day {Mathf.Max(1, currentDay)}\nPlay the cassette",
             GameJamObjectiveStep.FindFirstSignal => currentTarget != null

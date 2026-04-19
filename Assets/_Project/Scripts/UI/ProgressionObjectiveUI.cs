@@ -244,29 +244,6 @@ public sealed class ProgressionObjectiveUI : MonoBehaviour
 
     private string BuildDebugText()
     {
-        if (progressionManager == null)
-        {
-            return string.Empty;
-        }
-
-        string selectedCassette = progressionManager.SelectedCassetteToday != null
-            ? progressionManager.SelectedCassetteToday.CassetteName
-            : "None";
-
-        RadioEventData activeEvent = progressionManager.CurrentTargetRadioEvent;
-        string activeEventName = activeEvent != null ? activeEvent.EventName : "None";
-        string activeFrequency = activeEvent != null ? $"{activeEvent.TargetFrequency:F1} FM" : "None";
-        string radioDebugText = radioSystem != null
-            ? radioSystem.GetDebugStateSummary()
-            : "Active Event: None\nTarget Frequency: None\nInternal Frequency: N/A\nDisplayed Frequency: N/A\nScan Active: No\nLock Match: No";
-
-        return
-            $"Day: {progressionManager.CurrentDay}\n" +
-            $"Step: {progressionManager.CurrentObjectiveStep}\n" +
-            $"Selected Cassette: {selectedCassette}\n" +
-            $"Cassette Playback Complete: {(progressionManager.CassettePlaybackStartedToday ? "Yes" : "No")}\n" +
-            $"Current Target Event: {activeEventName}\n" +
-            $"Current Target Frequency: {activeFrequency}\n" +
-            radioDebugText;
+        return string.Empty;
     }
 }

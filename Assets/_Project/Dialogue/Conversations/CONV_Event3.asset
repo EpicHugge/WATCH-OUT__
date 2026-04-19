@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueConversation
   overrideRevealSpeed: 0
   charactersPerSecond: 60
-  defaultVoiceProfile: {fileID: 0}
+  defaultVoiceProfile: {fileID: 11400000, guid: f4633fb08c58ffb4eafa001c645f6a93, type: 2}
   speakerVoices: []
   lines:
   - speakerPreset: {fileID: 0}
     speakerName: Event 3
-    dialogueText: You're back on the air. Meet the second voice on another frequency.
+    dialogueText: ...
     overrideTextEffect: 0
     textEffect: 0
     overrideSpeakerNameColor: 0

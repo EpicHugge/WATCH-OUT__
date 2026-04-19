@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(PlayerInput))]
 public sealed class PlayerInteractionController : MonoBehaviour
 {
+    private const string GamepadInteractLabel = "Square / X";
     private const string InteractActionName = "Interact";
 
     [Header("Detection")]
@@ -253,22 +254,12 @@ public sealed class PlayerInteractionController : MonoBehaviour
 
     private string GetInteractBindingLabel()
     {
-        if (interactAction == null)
+        if (playerInput != null && playerInput.currentControlScheme == "Gamepad")
         {
-            return interactKey.ToString().ToUpperInvariant();
+            return GamepadInteractLabel;
         }
 
-        int bindingIndex = playerInput != null && !string.IsNullOrWhiteSpace(playerInput.currentControlScheme)
-            ? interactAction.GetBindingIndex(group: playerInput.currentControlScheme)
-            : -1;
-
-        string displayString = bindingIndex >= 0
-            ? interactAction.GetBindingDisplayString(bindingIndex)
-            : interactAction.GetBindingDisplayString();
-
-        return string.IsNullOrWhiteSpace(displayString)
-            ? interactKey.ToString().ToUpperInvariant()
-            : displayString;
+        return interactKey.ToString().ToUpperInvariant();
     }
 
     private static InteractionOutlineHighlight ResolveHighlight(InteractableBase interactable)

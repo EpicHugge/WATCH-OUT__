@@ -17,7 +17,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 6841e003e8fe9be4baed92c134a30ef4, type: 3}
   - {fileID: 8300000, guid: 2b86f57b46f76cf44a141ba42c9f9675, type: 3}
   - {fileID: 8300000, guid: 01eb05e434f4cbe43afb4f889a5e6ed6, type: 3}
-  volume: 0.2
+  volume: 0.05
   pitchRange: {x: 0.95, y: 1.05}
   lettersPerSound: 2
   minimumTimeBetweenBleeps: 0.035

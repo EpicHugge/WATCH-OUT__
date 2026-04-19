@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DialogueConversation
   overrideRevealSpeed: 0
   charactersPerSecond: 60
-  defaultVoiceProfile: {fileID: 0}
+  defaultVoiceProfile: {fileID: 11400000, guid: f4633fb08c58ffb4eafa001c645f6a93, type: 2}
   speakerVoices:
   - speakerName: Test01
     voiceProfile: {fileID: 11400000, guid: f4633fb08c58ffb4eafa001c645f6a93, type: 2}

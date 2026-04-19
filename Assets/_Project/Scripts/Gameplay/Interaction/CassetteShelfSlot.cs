@@ -149,7 +149,11 @@ public sealed class CassetteShelfSlot : MonoBehaviour
 
         if (IsWorkInProgress)
         {
-            hoverInteractable.SetInteractionEnabled(true);
+            bool generatorStarted = progressionManager == null ||
+                                    progressionManager.GeneratorStartedToday ||
+                                    progressionManager.UnlockAllInteractionsForDebug;
+
+            hoverInteractable.SetInteractionEnabled(generatorStarted);
             hoverInteractable.SetLocked(false);
             hoverInteractable.SetPrompt(workInProgressPrompt);
             return;

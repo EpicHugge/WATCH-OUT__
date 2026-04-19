@@ -12,14 +12,221 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dff16ec057fa46547bab6b69ce347937, type: 3}
   m_Name: CONV_Cassette2
   m_EditorClassIdentifier: Assembly-CSharp::DialogueConversation
-  overrideRevealSpeed: 0
-  charactersPerSecond: 60
-  defaultVoiceProfile: {fileID: 0}
+  overrideRevealSpeed: 1
+  charactersPerSecond: 30
+  defaultVoiceProfile: {fileID: 11400000, guid: f4633fb08c58ffb4eafa001c645f6a93, type: 2}
   speakerVoices: []
   lines:
   - speakerPreset: {fileID: 0}
     speakerName: Cassette 2
-    dialogueText: Entry two. Power is thin tonight. Tune carefully and do not lose the signal.
+    dialogueText: This is another tape for anyone still listening.
+    overrideTextEffect: 0
+    textEffect: 0
+    overrideSpeakerNameColor: 0
+    speakerNameColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideDialogueTextColor: 0
+    dialogueTextColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideBorderColor: 0
+    borderColor: {r: 0.57, g: 0.67, b: 0.69, a: 0.82}
+    overrideRevealSpeed: 0
+    charactersPerSecond: 60
+    voiceProfileOverride: {fileID: 0}
+    lineEvent:
+      eventType: 0
+      triggerTiming: 0
+      duration: 0.2
+      magnitude: 0.08
+      frequency: 24
+    autoAdvance: 0
+    autoAdvanceDelay: 0.15
+  - speakerPreset: {fileID: 0}
+    speakerName: 
+    dialogueText: "If you\u2019ve made it this far, then here\u2019s something else
+      you need to learn."
+    overrideTextEffect: 0
+    textEffect: 0
+    overrideSpeakerNameColor: 0
+    speakerNameColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideDialogueTextColor: 0
+    dialogueTextColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideBorderColor: 0
+    borderColor: {r: 0.57, g: 0.67, b: 0.69, a: 0.82}
+    overrideRevealSpeed: 0
+    charactersPerSecond: 60
+    voiceProfileOverride: {fileID: 0}
+    lineEvent:
+      eventType: 0
+      triggerTiming: 0
+      duration: 0.2
+      magnitude: 0.08
+      frequency: 24
+    autoAdvance: 0
+    autoAdvanceDelay: 0.15
+  - speakerPreset: {fileID: 0}
+    speakerName: 
+    dialogueText: There are places now where the air is just gone, and if you walk
+      into one, you may not walk back out.
+    overrideTextEffect: 0
+    textEffect: 0
+    overrideSpeakerNameColor: 0
+    speakerNameColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideDialogueTextColor: 0
+    dialogueTextColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideBorderColor: 0
+    borderColor: {r: 0.57, g: 0.67, b: 0.69, a: 0.82}
+    overrideRevealSpeed: 0
+    charactersPerSecond: 60
+    voiceProfileOverride: {fileID: 0}
+    lineEvent:
+      eventType: 0
+      triggerTiming: 0
+      duration: 0.2
+      magnitude: 0.08
+      frequency: 24
+    autoAdvance: 0
+    autoAdvanceDelay: 0.15
+  - speakerPreset: {fileID: 0}
+    speakerName: 
+    dialogueText: "You won\u2019t see them, and most times you won\u2019t know they\u2019re
+      there until it\u2019s too late."
+    overrideTextEffect: 0
+    textEffect: 0
+    overrideSpeakerNameColor: 0
+    speakerNameColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideDialogueTextColor: 0
+    dialogueTextColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideBorderColor: 0
+    borderColor: {r: 0.57, g: 0.67, b: 0.69, a: 0.82}
+    overrideRevealSpeed: 0
+    charactersPerSecond: 60
+    voiceProfileOverride: {fileID: 0}
+    lineEvent:
+      eventType: 0
+      triggerTiming: 0
+      duration: 0.2
+      magnitude: 0.08
+      frequency: 24
+    autoAdvance: 0
+    autoAdvanceDelay: 0.15
+  - speakerPreset: {fileID: 0}
+    speakerName: 
+    dialogueText: So before you enter a room, a hallway, or a stairwell, throw something
+      small ahead of you.
+    overrideTextEffect: 0
+    textEffect: 0
+    overrideSpeakerNameColor: 0
+    speakerNameColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideDialogueTextColor: 0
+    dialogueTextColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideBorderColor: 0
+    borderColor: {r: 0.57, g: 0.67, b: 0.69, a: 0.82}
+    overrideRevealSpeed: 0
+    charactersPerSecond: 60
+    voiceProfileOverride: {fileID: 0}
+    lineEvent:
+      eventType: 0
+      triggerTiming: 0
+      duration: 0.2
+      magnitude: 0.08
+      frequency: 24
+    autoAdvance: 0
+    autoAdvanceDelay: 0.15
+  - speakerPreset: {fileID: 0}
+    speakerName: 
+    dialogueText: A tennis ball is best, but anything that bounces or makes a clear
+      sound will do.
+    overrideTextEffect: 0
+    textEffect: 0
+    overrideSpeakerNameColor: 0
+    speakerNameColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideDialogueTextColor: 0
+    dialogueTextColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideBorderColor: 0
+    borderColor: {r: 0.57, g: 0.67, b: 0.69, a: 0.82}
+    overrideRevealSpeed: 0
+    charactersPerSecond: 60
+    voiceProfileOverride: {fileID: 0}
+    lineEvent:
+      eventType: 0
+      triggerTiming: 0
+      duration: 0.2
+      magnitude: 0.08
+      frequency: 24
+    autoAdvance: 0
+    autoAdvanceDelay: 0.15
+  - speakerPreset: {fileID: 0}
+    speakerName: 
+    dialogueText: If you hear it hit, roll, or bounce back, keep your distance and
+      listen.
+    overrideTextEffect: 0
+    textEffect: 0
+    overrideSpeakerNameColor: 0
+    speakerNameColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideDialogueTextColor: 0
+    dialogueTextColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideBorderColor: 0
+    borderColor: {r: 0.57, g: 0.67, b: 0.69, a: 0.82}
+    overrideRevealSpeed: 0
+    charactersPerSecond: 60
+    voiceProfileOverride: {fileID: 0}
+    lineEvent:
+      eventType: 0
+      triggerTiming: 0
+      duration: 0.2
+      magnitude: 0.08
+      frequency: 24
+    autoAdvance: 0
+    autoAdvanceDelay: 0.15
+  - speakerPreset: {fileID: 0}
+    speakerName: 
+    dialogueText: But if the sound cuts off too soon, or disappears completely, stop
+      right there.
+    overrideTextEffect: 0
+    textEffect: 0
+    overrideSpeakerNameColor: 0
+    speakerNameColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideDialogueTextColor: 0
+    dialogueTextColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideBorderColor: 0
+    borderColor: {r: 0.57, g: 0.67, b: 0.69, a: 0.82}
+    overrideRevealSpeed: 0
+    charactersPerSecond: 60
+    voiceProfileOverride: {fileID: 0}
+    lineEvent:
+      eventType: 0
+      triggerTiming: 0
+      duration: 0.2
+      magnitude: 0.08
+      frequency: 24
+    autoAdvance: 0
+    autoAdvanceDelay: 0.15
+  - speakerPreset: {fileID: 0}
+    speakerName: 
+    dialogueText: "Mark the place if you can, and don\u2019t make the mistake of
+      thinking that room is safe."
+    overrideTextEffect: 0
+    textEffect: 0
+    overrideSpeakerNameColor: 0
+    speakerNameColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideDialogueTextColor: 0
+    dialogueTextColor: {r: 1, g: 1, b: 1, a: 1}
+    overrideBorderColor: 0
+    borderColor: {r: 0.57, g: 0.67, b: 0.69, a: 0.82}
+    overrideRevealSpeed: 0
+    charactersPerSecond: 60
+    voiceProfileOverride: {fileID: 0}
+    lineEvent:
+      eventType: 0
+      triggerTiming: 0
+      duration: 0.2
+      magnitude: 0.08
+      frequency: 24
+    autoAdvance: 0
+    autoAdvanceDelay: 0.15
+  - speakerPreset: {fileID: 0}
+    speakerName: 
+    dialogueText: "Some things out there hunt you... and some places don\u2019t even
+      need to, so watch out."
     overrideTextEffect: 0
     textEffect: 0
     overrideSpeakerNameColor: 0
