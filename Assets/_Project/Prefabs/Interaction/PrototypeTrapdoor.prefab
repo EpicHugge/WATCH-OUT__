@@ -244,7 +244,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InteractionOutlineHighlight
   sourceRenderers:
-  - {fileID: 8482470498975216365}
+  - {fileID: 2440414724845690066}
   includeInactiveChildren: 1
 --- !u!114 &1914800081720724602
 MonoBehaviour:
@@ -659,6 +659,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8dd8faf4245c9a94eae3001a0d6294a6, type: 3}
+--- !u!23 &2440414724845690066 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 8dd8faf4245c9a94eae3001a0d6294a6, type: 3}
+  m_PrefabInstance: {fileID: 3899991808317177942}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3572819739158816701 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 8dd8faf4245c9a94eae3001a0d6294a6, type: 3}
