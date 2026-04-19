@@ -62,11 +62,6 @@ public sealed class ProgressionObjectiveUI : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        RefreshText();
-    }
-
     public static ProgressionObjectiveUI Create(Transform parent)
     {
         GameObject uiObject = new GameObject("ProgressionObjectiveUI", typeof(RectTransform), typeof(ProgressionObjectiveUI));
@@ -89,7 +84,6 @@ public sealed class ProgressionObjectiveUI : MonoBehaviour
 
     private void RefreshText()
     {
-        ResolveReferences();
         EnsureSetup();
 
         string objectiveText = progressionManager != null
