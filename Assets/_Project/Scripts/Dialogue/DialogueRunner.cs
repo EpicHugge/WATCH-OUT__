@@ -7,8 +7,8 @@ using UnityEngine.InputSystem.LowLevel;
 [DisallowMultipleComponent]
 public sealed class DialogueRunner : MonoBehaviour
 {
-    private const string ContinuePromptText = "Continue [Space]";
-    private const string EndConversationPromptText = "End Conversation [Space]";
+    private const string ContinuePromptText = "Continue [E / X]";
+    private const string EndConversationPromptText = "End Conversation [E / X]";
 
     [Header("References")]
     [SerializeField] private PlayerInput playerInput;
@@ -20,9 +20,9 @@ public sealed class DialogueRunner : MonoBehaviour
     [SerializeField] private DialogueCameraShake cameraShake;
 
     [Header("Input")]
-    [SerializeField] private Key keyboardAdvanceKey = Key.Space;
+    [SerializeField] private Key keyboardAdvanceKey = Key.E;
     [SerializeField] private Key keyboardAlternateAdvanceKey = Key.None;
-    [SerializeField] private GamepadButton gamepadAdvanceButton = GamepadButton.North;
+    [SerializeField] private GamepadButton gamepadAdvanceButton = GamepadButton.South;
 
     [Header("Reveal")]
     [SerializeField] [Min(1f)] private float charactersPerSecond = 60f;
