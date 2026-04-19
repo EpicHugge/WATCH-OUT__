@@ -71,6 +71,7 @@ public sealed class ProgressionManager : MonoBehaviour
     public IReadOnlyList<RadioEventData> ActiveRadioEventsToday => activeRadioEventsToday;
     public IReadOnlyList<RadioEventData> ResolvedRadioEventsToday => resolvedRadioEventsToday;
     public bool UnlockAllInteractionsForDebug => unlockAllInteractionsForDebug;
+    public RadioEventData CurrentTargetRadioEvent => GetCurrentTargetRadioEvent();
     public bool CanUseRadioControls =>
         unlockAllInteractionsForDebug ||
         !gameJamCompleted &&
@@ -572,11 +573,19 @@ public sealed class ProgressionManager : MonoBehaviour
 
     private void SetObjectiveStepInternal(GameJamObjectiveStep step)
     {
+        GameJamObjectiveStep previousStep = currentObjectiveStep;
         currentObjectiveStep = step;
         RefreshAvailableCassettes();
         RefreshActiveRadioEvents();
         UpdatePhaseFromCurrentObjective();
         RefreshSleepAvailability();
+
+        if (previousStep != currentObjectiveStep)
+        {
+            Debug.Log(
+                $"Progression advanced to Day {currentDay} {currentObjectiveStep}. Selected cassette: {selectedCassetteToday?.CassetteName ?? "None"}.",
+                this);
+        }
     }
 
     private void SetPhaseInternal(DayPhase phase)
@@ -605,16 +614,6 @@ public sealed class ProgressionManager : MonoBehaviour
         KeyCode effectiveDebugKey = debugInstantPowerKey == KeyCode.None
             ? KeyCode.F8
             : debugInstantPowerKey;
-
-        if (enableDebugInstantPowerKey && Input.GetKeyDown(effectiveDebugKey))
-        {
-            return true;
-        }
-
-        if (Input.GetKeyDown(KeyCode.F8))
-        {
-            return true;
-        }
 
 #if ENABLE_INPUT_SYSTEM
         Keyboard keyboard = Keyboard.current;
@@ -652,6 +651,16 @@ public sealed class ProgressionManager : MonoBehaviour
             _ => false
         };
 #else
+        if (enableDebugInstantPowerKey && Input.GetKeyDown(effectiveDebugKey))
+        {
+            return true;
+        }
+
+        if (Input.GetKeyDown(KeyCode.F8))
+        {
+            return true;
+        }
+
         return false;
 #endif
     }
@@ -842,14 +851,19 @@ public sealed class ProgressionManager : MonoBehaviour
 
     private string BuildObjectiveText()
     {
+        RadioEventData currentTarget = GetCurrentTargetRadioEvent();
         return currentObjectiveStep switch
         {
             GameJamObjectiveStep.WakeUp => $"Day {Mathf.Max(1, currentDay)}\nWake up",
             GameJamObjectiveStep.StartGenerator => $"Day {Mathf.Max(1, currentDay)}\nStart the generator",
             GameJamObjectiveStep.PickCassette => $"Day {Mathf.Max(1, currentDay)}\nPick a cassette",
             GameJamObjectiveStep.PlayCassette => $"Day {Mathf.Max(1, currentDay)}\nPlay the cassette",
-            GameJamObjectiveStep.FindFirstSignal => $"Day {Mathf.Max(1, currentDay)}\nTune the radio",
-            GameJamObjectiveStep.FindSecondSignal => $"Day {Mathf.Max(1, currentDay)}\nFind the second signal",
+            GameJamObjectiveStep.FindFirstSignal => currentTarget != null
+                ? $"Day {Mathf.Max(1, currentDay)}\nFind {currentTarget.EventName} on radio: {currentTarget.TargetFrequency:F1} FM"
+                : $"Day {Mathf.Max(1, currentDay)}\nTune the radio",
+            GameJamObjectiveStep.FindSecondSignal => currentTarget != null
+                ? $"Day {Mathf.Max(1, currentDay)}\nFind {currentTarget.EventName} on radio: {currentTarget.TargetFrequency:F1} FM"
+                : $"Day {Mathf.Max(1, currentDay)}\nFind the second signal",
             GameJamObjectiveStep.PowerOut => $"Day {Mathf.Max(1, currentDay)}\nThe power is out",
             GameJamObjectiveStep.ReturnToBed => $"Day {Mathf.Max(1, currentDay)}\nReturn to bed",
             GameJamObjectiveStep.GameComplete => "Game Jam demo complete",

@@ -116,9 +116,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 317133121072958322}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.8764663, y: 0.00000031344865, z: -0.4814632, w: -0.00000017218449}
+  m_LocalRotation: {x: 0.8764664, y: 0, z: -0.4814631, w: 0}
   m_LocalPosition: {x: 1.299052, y: 0.879, z: -4.292697}
-  m_LocalScale: {x: 11.713778, y: -5.2171545, z: 11.86759}
+  m_LocalScale: {x: 16.166185, y: -7.200195, z: 16.378462}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7753936043694855859}
@@ -1178,15 +1178,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4173517666909797129, guid: eb2b8af7391fa50469451fa5463b0e32, type: 3}
       propertyPath: slotMode
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4173517666909797129, guid: eb2b8af7391fa50469451fa5463b0e32, type: 3}
       propertyPath: cassetteData
       value: 
-      objectReference: {fileID: 11400000, guid: 34ebf78b414f41b1bbcf36c6a62b1c34, type: 2}
+      objectReference: {fileID: 0}
     - target: {fileID: 5318600072560130618, guid: eb2b8af7391fa50469451fa5463b0e32, type: 3}
       propertyPath: prompt
-      value: Pick Cassette
+      value: WIP
       objectReference: {fileID: 0}
     - target: {fileID: 5318600072560130618, guid: eb2b8af7391fa50469451fa5463b0e32, type: 3}
       propertyPath: objectToMove
@@ -1281,11 +1281,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4173517666909797129, guid: eb2b8af7391fa50469451fa5463b0e32, type: 3}
       propertyPath: slotMode
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4173517666909797129, guid: eb2b8af7391fa50469451fa5463b0e32, type: 3}
+      propertyPath: cassetteData
+      value: 
+      objectReference: {fileID: 11400000, guid: 34ebf78b414f41b1bbcf36c6a62b1c34, type: 2}
     - target: {fileID: 5318600072560130618, guid: eb2b8af7391fa50469451fa5463b0e32, type: 3}
       propertyPath: prompt
-      value: WIP
+      value: Pick Cassette
       objectReference: {fileID: 0}
     - target: {fileID: 5318600072560130618, guid: eb2b8af7391fa50469451fa5463b0e32, type: 3}
       propertyPath: objectToMove

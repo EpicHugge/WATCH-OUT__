@@ -1,19 +1,23 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using WatchOut;
 
 [DisallowMultipleComponent]
 public sealed class ProgressionObjectiveUI : MonoBehaviour
 {
     private const string ProjectFontResourcePath = "Fonts/VCR_OSD_MONO_1.001";
     private const string LabelName = "ObjectiveLabel";
+    private const string DebugLabelName = "DebugLabel";
 
     [Header("References")]
     [SerializeField] private ProgressionManager progressionManager;
+    [SerializeField] private RadioSystem radioSystem;
     [SerializeField] private Canvas overlayCanvas;
     [SerializeField] private CanvasScaler canvasScaler;
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private TextMeshProUGUI objectiveLabel;
+    [SerializeField] private TextMeshProUGUI debugLabel;
     [SerializeField] private TMP_FontAsset objectiveFont;
 
     [Header("Layout")]
@@ -26,6 +30,10 @@ public sealed class ProgressionObjectiveUI : MonoBehaviour
     [SerializeField] private Color textColor = new Color(0.92f, 0.92f, 0.92f, 1f);
     [SerializeField] private Color outlineColor = new Color(0f, 0f, 0f, 0.9f);
     [SerializeField] private float fontSize = 28f;
+    [SerializeField] private float debugFontSize = 18f;
+
+    private string lastObjectiveText = string.Empty;
+    private string lastDebugText = string.Empty;
 
     private void Awake()
     {
@@ -54,6 +62,11 @@ public sealed class ProgressionObjectiveUI : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        RefreshText();
+    }
+
     public static ProgressionObjectiveUI Create(Transform parent)
     {
         GameObject uiObject = new GameObject("ProgressionObjectiveUI", typeof(RectTransform), typeof(ProgressionObjectiveUI));
@@ -67,18 +80,37 @@ public sealed class ProgressionObjectiveUI : MonoBehaviour
         {
             progressionManager = FindAnyObjectByType<ProgressionManager>();
         }
+
+        if (radioSystem == null)
+        {
+            radioSystem = FindAnyObjectByType<RadioSystem>();
+        }
     }
 
     private void RefreshText()
     {
+        ResolveReferences();
         EnsureSetup();
 
         string objectiveText = progressionManager != null
             ? progressionManager.CurrentObjectiveText
             : string.Empty;
+        string debugText = BuildDebugText();
 
-        objectiveLabel.text = objectiveText;
+        if (objectiveText != lastObjectiveText)
+        {
+            objectiveLabel.text = objectiveText;
+            lastObjectiveText = objectiveText;
+        }
+
+        if (debugText != lastDebugText)
+        {
+            debugLabel.text = debugText;
+            lastDebugText = debugText;
+        }
+
         objectiveLabel.gameObject.SetActive(!string.IsNullOrWhiteSpace(objectiveText));
+        debugLabel.gameObject.SetActive(!string.IsNullOrWhiteSpace(debugText));
         canvasGroup.alpha = objectiveLabel.gameObject.activeSelf ? 1f : 0f;
         canvasGroup.interactable = false;
         canvasGroup.blocksRaycasts = false;
@@ -107,6 +139,7 @@ public sealed class ProgressionObjectiveUI : MonoBehaviour
         canvasGroup = GetOrAddComponent(gameObject, canvasGroup);
         EnsureProjectFont();
         EnsureLabel();
+        EnsureDebugLabel();
     }
 
     private void EnsureLabel()
@@ -144,6 +177,39 @@ public sealed class ProgressionObjectiveUI : MonoBehaviour
         outlineTarget.outlineColor = outlineColor;
     }
 
+    private void EnsureDebugLabel()
+    {
+        if (debugLabel == null)
+        {
+            Transform labelTransform = transform.Find(DebugLabelName);
+            if (labelTransform == null)
+            {
+                GameObject labelObject = new GameObject(DebugLabelName, typeof(RectTransform), typeof(TextMeshProUGUI));
+                labelObject.transform.SetParent(transform, false);
+                labelTransform = labelObject.transform;
+            }
+
+            debugLabel = labelTransform.GetComponent<TextMeshProUGUI>();
+        }
+
+        RectTransform labelRect = debugLabel.rectTransform;
+        labelRect.anchorMin = new Vector2(0f, 1f);
+        labelRect.anchorMax = new Vector2(0f, 1f);
+        labelRect.pivot = new Vector2(0f, 1f);
+        labelRect.anchoredPosition = new Vector2(anchoredPosition.x, anchoredPosition.y - 96f);
+        labelRect.sizeDelta = new Vector2(560f, 280f);
+        labelRect.localScale = Vector3.one;
+
+        debugLabel.font = objectiveFont != null ? objectiveFont : TMP_Settings.defaultFontAsset;
+        debugLabel.fontSize = debugFontSize;
+        debugLabel.alignment = TextAlignmentOptions.TopLeft;
+        debugLabel.color = new Color(textColor.r, textColor.g, textColor.b, 0.92f);
+        debugLabel.textWrappingMode = TextWrappingModes.Normal;
+        debugLabel.raycastTarget = false;
+        debugLabel.outlineWidth = 0.14f;
+        debugLabel.outlineColor = outlineColor;
+    }
+
     private void EnsureProjectFont()
     {
         if (objectiveFont != null)
@@ -174,5 +240,33 @@ public sealed class ProgressionObjectiveUI : MonoBehaviour
         }
 
         return component;
+    }
+
+    private string BuildDebugText()
+    {
+        if (progressionManager == null)
+        {
+            return string.Empty;
+        }
+
+        string selectedCassette = progressionManager.SelectedCassetteToday != null
+            ? progressionManager.SelectedCassetteToday.CassetteName
+            : "None";
+
+        RadioEventData activeEvent = progressionManager.CurrentTargetRadioEvent;
+        string activeEventName = activeEvent != null ? activeEvent.EventName : "None";
+        string activeFrequency = activeEvent != null ? $"{activeEvent.TargetFrequency:F1} FM" : "None";
+        string radioDebugText = radioSystem != null
+            ? radioSystem.GetDebugStateSummary()
+            : "Active Event: None\nTarget Frequency: None\nInternal Frequency: N/A\nDisplayed Frequency: N/A\nScan Active: No\nLock Match: No";
+
+        return
+            $"Day: {progressionManager.CurrentDay}\n" +
+            $"Step: {progressionManager.CurrentObjectiveStep}\n" +
+            $"Selected Cassette: {selectedCassette}\n" +
+            $"Cassette Playback Complete: {(progressionManager.CassettePlaybackStartedToday ? "Yes" : "No")}\n" +
+            $"Current Target Event: {activeEventName}\n" +
+            $"Current Target Frequency: {activeFrequency}\n" +
+            radioDebugText;
     }
 }

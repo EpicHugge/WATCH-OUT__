@@ -80,6 +80,11 @@ public sealed class FirstPersonPlayerController : MonoBehaviour
             gameObject.AddComponent<DialogueRunner>();
         }
 
+        if (GetComponentInChildren<ProgressionObjectiveUI>(true) == null)
+        {
+            ProgressionObjectiveUI.Create(transform);
+        }
+
         ApplyLegacyTuningIfNeeded();
         EnsureCrosshair();
         currentYaw = transform.eulerAngles.y;

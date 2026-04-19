@@ -29,7 +29,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2.1844, y: 2.1844, z: 2.1844}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 410000000000000009}
@@ -75,6 +75,7 @@ MonoBehaviour:
       m_Calls: []
   cassettePlayerReceiver: {fileID: 410000000000000003}
   dialogueRunner: {fileID: 0}
+  progressionManager: {fileID: 0}
   noCassetteLoadedConversation: {fileID: 11400000, guid: a54186ef5a0b68345ad4531e7a635e1e, type: 2}
   playPromptPrefix: Play
   noCassettePrompt: No Cassette Loaded
@@ -97,8 +98,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.55, y: 0.22, z: 0.38}
-  m_Center: {x: 0, y: 0.03, z: 0}
+  m_Size: {x: 0.25169215, y: 0.22, z: 0.2587185}
+  m_Center: {x: -0.0017749742, y: 0.03, z: 0.0058790715}
 --- !u!1 &410000000000000008
 GameObject:
   m_ObjectHideFlags: 0

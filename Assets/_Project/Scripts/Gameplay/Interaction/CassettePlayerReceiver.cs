@@ -13,9 +13,11 @@ public sealed class CassettePlayerReceiver : MonoBehaviour
 
     private CassetteData loadedCassette;
     private CassetteData pendingPlaybackCassette;
+    private DialogueRunner subscribedDialogueRunner;
 
     public CassetteData LoadedCassette => loadedCassette;
     public bool HasLoadedCassette => loadedCassette != null;
+    public CassetteData PendingPlaybackCassette => pendingPlaybackCassette;
 
     private void Awake()
     {
@@ -26,25 +28,18 @@ public sealed class CassettePlayerReceiver : MonoBehaviour
     private void OnEnable()
     {
         ResolveReferences();
-
-        if (dialogueRunner != null)
-        {
-            dialogueRunner.ConversationEnded += HandleConversationEnded;
-        }
     }
 
     private void OnDisable()
     {
-        if (dialogueRunner != null)
-        {
-            dialogueRunner.ConversationEnded -= HandleConversationEnded;
-        }
+        RefreshSubscriptions(clearOnly: true);
     }
 
     public bool TrySelectCassette(CassetteData cassette)
     {
         if (cassette == null)
         {
+            Debug.LogWarning("CassettePlayerReceiver rejected a null cassette selection.", this);
             return false;
         }
 
@@ -52,30 +47,46 @@ public sealed class CassettePlayerReceiver : MonoBehaviour
 
         if (loadedCassette != null && loadedCassette != cassette && !replaceLoadedCassette)
         {
+            Debug.LogWarning(
+                $"CassettePlayerReceiver blocked selecting '{cassette.CassetteName}' because '{loadedCassette.CassetteName}' is already loaded.",
+                this);
             return false;
         }
+
+        CassetteData previousCassette = loadedCassette;
+        loadedCassette = cassette;
+        RefreshVisualState();
 
         if (progressionManager != null && !progressionManager.SelectCassette(cassette))
         {
+            loadedCassette = previousCassette;
+            RefreshVisualState();
+            Debug.LogWarning(
+                $"CassettePlayerReceiver could not select '{cassette.CassetteName}' during step {progressionManager.CurrentObjectiveStep}.",
+                this);
             return false;
         }
 
-        loadedCassette = cassette;
         RefreshVisualState();
         return true;
     }
 
     public bool TryPlayLoadedCassette()
     {
+        ResolveReferences();
+        TryRestoreLoadedCassetteFromProgression();
+
         if (loadedCassette == null)
         {
+            Debug.LogWarning("CassettePlayerReceiver could not play because no cassette is loaded.", this);
             return false;
         }
 
-        ResolveReferences();
-
         if (progressionManager != null && !progressionManager.CanPlayCassette(loadedCassette))
         {
+            Debug.LogWarning(
+                $"CassettePlayerReceiver blocked playback for '{loadedCassette.CassetteName}' during step {progressionManager.CurrentObjectiveStep}.",
+                this);
             return false;
         }
 
@@ -88,6 +99,7 @@ public sealed class CassettePlayerReceiver : MonoBehaviour
             }
 
             pendingPlaybackCassette = loadedCassette;
+            Debug.Log($"CassettePlayerReceiver started playback for '{loadedCassette.CassetteName}'.", this);
             if (!dialogueRunner.StartConversation(loadedCassette.BroadcastConversation))
             {
                 pendingPlaybackCassette = null;
@@ -112,6 +124,26 @@ public sealed class CassettePlayerReceiver : MonoBehaviour
         {
             dialogueRunner = FindAnyObjectByType<DialogueRunner>();
         }
+
+        RefreshSubscriptions();
+    }
+
+    private void TryRestoreLoadedCassetteFromProgression()
+    {
+        if (loadedCassette != null || progressionManager == null)
+        {
+            return;
+        }
+
+        CassetteData selectedCassette = progressionManager.SelectedCassetteToday;
+        if (selectedCassette == null || progressionManager.CurrentObjectiveStep != GameJamObjectiveStep.PlayCassette)
+        {
+            return;
+        }
+
+        loadedCassette = selectedCassette;
+        RefreshVisualState();
+        Debug.Log($"CassettePlayerReceiver restored '{selectedCassette.CassetteName}' from progression state.", this);
     }
 
     private void HandleConversationEnded(DialogueConversation conversation)
@@ -126,7 +158,11 @@ public sealed class CassettePlayerReceiver : MonoBehaviour
             return;
         }
 
-        progressionManager?.MarkCassettePlaybackStarted(pendingPlaybackCassette);
+        bool playbackMarkedComplete = progressionManager != null &&
+                                      progressionManager.MarkCassettePlaybackStarted(pendingPlaybackCassette);
+        Debug.Log(
+            $"CassettePlayerReceiver finished '{pendingPlaybackCassette.CassetteName}'. Playback marked complete: {playbackMarkedComplete}.",
+            this);
         pendingPlaybackCassette = null;
     }
 
@@ -136,5 +172,22 @@ public sealed class CassettePlayerReceiver : MonoBehaviour
         {
             loadedCassetteVisual.SetActive(loadedCassette != null);
         }
+    }
+
+    private void RefreshSubscriptions(bool clearOnly = false)
+    {
+        if (subscribedDialogueRunner != null)
+        {
+            subscribedDialogueRunner.ConversationEnded -= HandleConversationEnded;
+            subscribedDialogueRunner = null;
+        }
+
+        if (clearOnly || !isActiveAndEnabled || dialogueRunner == null)
+        {
+            return;
+        }
+
+        dialogueRunner.ConversationEnded += HandleConversationEnded;
+        subscribedDialogueRunner = dialogueRunner;
     }
 }

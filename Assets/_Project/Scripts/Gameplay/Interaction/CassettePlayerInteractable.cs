@@ -71,6 +71,13 @@ public sealed class CassettePlayerInteractable : InteractableBase
             return;
         }
 
+        if (progressionManager != null)
+        {
+            Debug.LogWarning(
+                $"CassettePlayerInteractable interaction failed during step {progressionManager.CurrentObjectiveStep}. Selected cassette: {progressionManager.SelectedCassetteToday?.CassetteName ?? "None"}.",
+                this);
+        }
+
         if (dialogueRunner != null && noCassetteLoadedConversation != null)
         {
             dialogueRunner.StartConversation(noCassetteLoadedConversation);
@@ -109,6 +116,9 @@ public sealed class CassettePlayerInteractable : InteractableBase
         }
 
         CassetteData loadedCassette = cassettePlayerReceiver != null ? cassettePlayerReceiver.LoadedCassette : null;
-        SetLocked(!progressionManager.CanPlayCassette(loadedCassette));
+        CassetteData selectedCassette = progressionManager.SelectedCassetteToday;
+        bool canPlayLoadedCassette = progressionManager.CanPlayCassette(loadedCassette);
+        bool canPlaySelectedCassette = selectedCassette != loadedCassette && progressionManager.CanPlayCassette(selectedCassette);
+        SetLocked(!(canPlayLoadedCassette || canPlaySelectedCassette));
     }
 }
