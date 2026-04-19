@@ -102,6 +102,7 @@ public sealed class GeneratorInteractable : InteractableBase
 
         if (isOn)
         {
+            progressionManager?.StartGenerator();
             onTurnedOn?.Invoke();
             TurnedOn?.Invoke();
         }
