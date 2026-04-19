@@ -2959,9 +2959,9 @@ MonoBehaviour:
   typewriter: {fileID: 0}
   voicePlayer: {fileID: 0}
   cameraShake: {fileID: 0}
-  keyboardAdvanceKey: 1
+  keyboardAdvanceKey: 19
   keyboardAlternateAdvanceKey: 0
-  gamepadAdvanceButton: 4
+  gamepadAdvanceButton: 6
   charactersPerSecond: 60
 --- !u!114 &2091946578
 MonoBehaviour:

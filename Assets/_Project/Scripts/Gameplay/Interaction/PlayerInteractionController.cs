@@ -5,6 +5,8 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(PlayerInput))]
 public sealed class PlayerInteractionController : MonoBehaviour
 {
+    private const string InteractActionName = "Interact";
+
     [Header("Detection")]
     [SerializeField] private Camera interactionCamera;
     [SerializeField] private LayerMask interactableLayers;
@@ -17,6 +19,8 @@ public sealed class PlayerInteractionController : MonoBehaviour
     [SerializeField] private InteractionUI interactionUI;
     [SerializeField] private Font interactionPromptFont;
 
+    private PlayerInput playerInput;
+    private InputAction interactAction;
     private InteractableBase currentTarget;
     private RaycastHit currentTargetHit;
     private string currentPrompt = string.Empty;
@@ -29,6 +33,8 @@ public sealed class PlayerInteractionController : MonoBehaviour
 
     private void Awake()
     {
+        playerInput = GetComponent<PlayerInput>();
+
         if (interactionCamera == null)
         {
             interactionCamera = GetComponentInChildren<Camera>();
@@ -59,6 +65,11 @@ public sealed class PlayerInteractionController : MonoBehaviour
         }
 
         ClearCurrentTarget();
+    }
+
+    private void OnEnable()
+    {
+        CacheActions();
     }
 
     private void OnDisable()
@@ -132,6 +143,13 @@ public sealed class PlayerInteractionController : MonoBehaviour
         }
 
         UpdateCurrentTarget(forceUiRefresh: true);
+    }
+
+    private void CacheActions()
+    {
+        interactAction = playerInput != null && playerInput.actions != null
+            ? playerInput.actions[InteractActionName]
+            : null;
     }
 
     private void UpdateCurrentTarget(bool forceUiRefresh = false)
@@ -209,17 +227,48 @@ public sealed class PlayerInteractionController : MonoBehaviour
 
     private bool WasInteractPressedThisFrame()
     {
+        if (interactAction != null)
+        {
+            return interactAction.WasPressedThisFrame();
+        }
+
         return Keyboard.current != null && Keyboard.current[interactKey].wasPressedThisFrame;
     }
 
     private bool WasInteractReleasedThisFrame()
     {
+        if (interactAction != null)
+        {
+            return interactAction.WasReleasedThisFrame();
+        }
+
         return Keyboard.current != null && Keyboard.current[interactKey].wasReleasedThisFrame;
     }
 
     private string FormatPrompt(string prompt)
     {
-        return $"[{interactKey}] {prompt}";
+        string bindingLabel = GetInteractBindingLabel();
+        return string.IsNullOrWhiteSpace(bindingLabel) ? prompt : $"[{bindingLabel}] {prompt}";
+    }
+
+    private string GetInteractBindingLabel()
+    {
+        if (interactAction == null)
+        {
+            return interactKey.ToString().ToUpperInvariant();
+        }
+
+        int bindingIndex = playerInput != null && !string.IsNullOrWhiteSpace(playerInput.currentControlScheme)
+            ? interactAction.GetBindingIndex(group: playerInput.currentControlScheme)
+            : -1;
+
+        string displayString = bindingIndex >= 0
+            ? interactAction.GetBindingDisplayString(bindingIndex)
+            : interactAction.GetBindingDisplayString();
+
+        return string.IsNullOrWhiteSpace(displayString)
+            ? interactKey.ToString().ToUpperInvariant()
+            : displayString;
     }
 
     private static InteractionOutlineHighlight ResolveHighlight(InteractableBase interactable)
