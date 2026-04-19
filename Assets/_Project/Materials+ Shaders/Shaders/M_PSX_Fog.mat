@@ -25,10 +25,10 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _ColorSteps: 32
+    - _ColorSteps: 56
     - _FogEnd: 50
     - _FogStart: 10
     m_Colors:
-    - _FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    - _FogColor: {r: 0.6226415, g: 0.3241679, b: 0.2966358, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
