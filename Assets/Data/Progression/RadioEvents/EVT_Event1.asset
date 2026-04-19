@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97e1d5a3fffb4b24cafd7eb0f44b70ba, type: 3}
+  m_Name: EVT_Event1
+  m_EditorClassIdentifier: Assembly-CSharp::RadioEventData
+  eventName: Event 1
+  targetFrequency: 90.1
+  dialogueConversation: {fileID: 11400000, guid: 2ad52bf11c3d4bf9b178f71593d1b1ca, type: 2}
+  broadcastAudio: {fileID: 0}
+  minDay: 1
+  maxDay: 1
+  allowedCassettes: []
+  oneTimeOnly: 1
+  debugNotes: Day 1 first radio event.

@@ -46,21 +46,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProgressionManager
   days:
   - {fileID: 11400000, guid: 56c75201429b481aaef9e90462b252f0, type: 2}
+  - {fileID: 11400000, guid: 499e5e2fc8c647429359d79690a01e02, type: 2}
   startingDay: 1
   autoStartOnPlay: 1
   completeWakeUpImmediatelyOnSceneStart: 1
+  cassette1: {fileID: 11400000, guid: fed42875686645a9819166d7899d4b68, type: 2}
+  cassette2: {fileID: 11400000, guid: 34ebf78b414f41b1bbcf36c6a62b1c34, type: 2}
+  day1Event1: {fileID: 11400000, guid: cb7511835c4d443492d8a561ca5ee766, type: 2}
+  day1Event2: {fileID: 11400000, guid: 005832cf4ec84ccc88a0dee50c6c33eb, type: 2}
+  day2Event1: {fileID: 11400000, guid: 2ed2da40d4244a6db043a9740f5c024f, type: 2}
+  day2Event2: {fileID: 11400000, guid: 6866b17c1dbe4962a98b3a1c7f8d1926, type: 2}
   dialogueRunner: {fileID: 0}
-  playDayStartDialogueAutomatically: 1
-  playDayEndDialogueOnPowerOut: 0
-  powerOutMode: 0
-  radioEventsNeededBeforePowerOut: 1
-  radioScanSecondsBeforePowerOut: 120
+  generatorInteractable: {fileID: 0}
+  cassettePlayerReceiver: {fileID: 0}
+  sleepBedInteractable: {fileID: 0}
   frequencyMatchTolerance: 0.05
-  unlockAllInteractionsForDebug: 1
-  allowRadioDebugWithoutCassette: 0
-  repeatSameRadioLoopEveryNightInTestBuild: 1
-  powerDownGeneratorAndRadioAfterDialogueInTestBuild: 1
+  unlockAllInteractionsForDebug: 0
+  enableDebugInstantPowerKey: 0
+  debugInstantPowerKey: 119
+  debugGeneratorInteractable: {fileID: 0}
   debugSetDay: 1
-  debugSetPhase: 0
-  debugTestCassette: {fileID: 11400000, guid: 39d0dd52ecf24bb3ba7b78f81ebf5cf8, type: 2}
+  debugSetPhase: 1
+  debugTestCassette: {fileID: 11400000, guid: fed42875686645a9819166d7899d4b68, type: 2}
   debugTestFrequency: 94.3

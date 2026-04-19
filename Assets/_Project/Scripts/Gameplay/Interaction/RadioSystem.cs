@@ -58,15 +58,25 @@ namespace WatchOut
         private bool isIncreasing;
         private bool isDecreasing;
         private bool isAutoScanning;
-        private bool manualSignalLockArmed;
         private bool hiddenSignalLocked;
         private float holdTimer;
         private float changeTimer;
         private RadioEventData currentLockedEvent;
-        private Coroutine pendingDebugLoopRoutine;
+        private RadioEventData pendingResolvedEvent;
         private MaterialPropertyBlock screenPropertyBlock;
+        private ProgressionManager subscribedProgressionManager;
+        private DialogueRunner subscribedDialogueRunner;
+        private GeneratorInteractable subscribedGeneratorInteractable;
+        private RadioEventData lastLoggedActiveEvent;
+        private bool lastLoggedLockMatch;
 
         public float CurrentFrequency => currentFrequency;
+        public float DisplayedFrequency => Mathf.Round(currentFrequency * 10f) / 10f;
+        public bool IsAutoScanning => isAutoScanning;
+        public RadioEventData ActiveJamEvent =>
+            progressionManager != null && progressionManager.ActiveRadioEventsToday.Count > 0
+                ? progressionManager.ActiveRadioEventsToday[0]
+                : null;
 
         private void Awake()
         {
@@ -76,29 +86,11 @@ namespace WatchOut
         private void OnEnable()
         {
             ResolveReferences();
-
-            if (progressionManager != null)
-            {
-                progressionManager.StateChanged += HandleProgressionStateChanged;
-            }
-
-            if (generatorInteractable != null)
-            {
-                generatorInteractable.StateChanged += HandleGeneratorStateChanged;
-            }
         }
 
         private void OnDisable()
         {
-            if (progressionManager != null)
-            {
-                progressionManager.StateChanged -= HandleProgressionStateChanged;
-            }
-
-            if (generatorInteractable != null)
-            {
-                generatorInteractable.StateChanged -= HandleGeneratorStateChanged;
-            }
+            RefreshSubscriptions(clearOnly: true);
         }
 
         private void Start()
@@ -108,6 +100,7 @@ namespace WatchOut
             ConfigureAudioSources();
 
             RefreshPowerState();
+            LogActiveEventIfChanged();
         }
 
         private void Update()
@@ -143,14 +136,19 @@ namespace WatchOut
                     while (changeTimer >= timePerStep)
                     {
                         changeTimer -= timePerStep;
-                        if (isIncreasing) currentFrequency += frequencyStep;
-                        if (isDecreasing) currentFrequency -= frequencyStep;
+                        if (isIncreasing)
+                        {
+                            StepFrequency(frequencyStep, "Tune Up", attemptManualLock: true, snapToStep: true);
+                        }
+                        else if (isDecreasing)
+                        {
+                            StepFrequency(-frequencyStep, "Tune Down", attemptManualLock: true, snapToStep: true);
+                        }
 
-                        // Wrap frequencies around when passing min/max limits
-                        if (currentFrequency > maxFrequency) currentFrequency = minFrequency;
-                        if (currentFrequency < minFrequency) currentFrequency = maxFrequency;
-                        
-                        UpdateDisplay();
+                        if (currentLockedEvent != null || pendingResolvedEvent != null)
+                        {
+                            break;
+                        }
                     }
                 }
             }
@@ -162,10 +160,7 @@ namespace WatchOut
 
             if (isAutoScanning)
             {
-                currentFrequency += autoScanSpeed * Time.deltaTime;
-                if (currentFrequency > maxFrequency) currentFrequency = minFrequency;
-                if (currentFrequency < minFrequency) currentFrequency = maxFrequency;
-                UpdateDisplay();
+                StepFrequency(autoScanSpeed * Time.deltaTime, "Scan", attemptManualLock: false, snapToStep: false);
             }
         }
 
@@ -207,11 +202,10 @@ namespace WatchOut
                     nearSignalAudioSource.volume = Mathf.Lerp(0f, maxNearSignalVolume, signalStrength) * nearSignalMultiplier;
                 }
 
-                bool manualExactMatch = closestDistance <= lockTolerance && manualSignalLockArmed && !isAutoScanning;
-
                 if (useHiddenTestSignal)
                 {
-                    if (manualExactMatch && !hiddenSignalLocked)
+                    bool canTriggerHiddenLock = !isAutoScanning && IsFrequencyWithinLockWindow(currentFrequency, targetFrequency, lockTolerance);
+                    if (canTriggerHiddenLock && !hiddenSignalLocked)
                     {
                         TriggerHiddenTestSignalLock(lockTolerance);
                     }
@@ -222,13 +216,7 @@ namespace WatchOut
                 }
                 else if (closestEvent != null)
                 {
-                    if (closestDistance <= lockTolerance &&
-                        currentLockedEvent != closestEvent &&
-                        manualSignalLockArmed)
-                    {
-                        LockOnSignal(closestEvent);
-                    }
-                    else if (closestDistance > lockTolerance && currentLockedEvent == closestEvent)
+                    if (closestDistance > lockTolerance && currentLockedEvent == closestEvent)
                     {
                         currentLockedEvent = null;
                     }
@@ -242,8 +230,17 @@ namespace WatchOut
 
         private void LockOnSignal(RadioEventData radioEvent)
         {
+            if (radioEvent == null)
+            {
+                return;
+            }
+
+            if (progressionManager != null && !progressionManager.IsCurrentTargetRadioEvent(radioEvent))
+            {
+                return;
+            }
+
             currentLockedEvent = radioEvent;
-            manualSignalLockArmed = false;
 
             // Stop all tuning mechanisms to "lock" onto the channel
             isAutoScanning = false;
@@ -259,16 +256,25 @@ namespace WatchOut
                 exactLockAudioSource.PlayOneShot(exactLockClip);
             }
 
-            bool eventFoundNow = progressionManager == null || progressionManager.MarkRadioEventFound(radioEvent);
+            Debug.Log(
+                $"RadioSystem locked onto '{radioEvent.EventName}' at {radioEvent.TargetFrequency:F1} FM on Day {progressionManager?.CurrentDay ?? 0}.",
+                this);
 
-            if (eventFoundNow && radioEvent.DialogueConversation != null && dialogueRunner != null)
+            if (radioEvent.DialogueConversation != null && dialogueRunner != null)
             {
+                pendingResolvedEvent = radioEvent;
                 SyncStaticLoopPlayback(false);
                 staticAudioSource.volume = 0f;
-                dialogueRunner.StartConversation(radioEvent.DialogueConversation);
+                if (!dialogueRunner.StartConversation(radioEvent.DialogueConversation))
+                {
+                    pendingResolvedEvent = null;
+                    return;
+                }
+
+                return;
             }
 
-            HandleDebugLoopCompletion(eventFoundNow);
+            progressionManager?.MarkRadioEventFound(radioEvent);
         }
 
         public void SetIncreasing(bool value)
@@ -282,15 +288,9 @@ namespace WatchOut
             if (value)
             {
                 TryBeginRadioScan();
-                manualSignalLockArmed = true;
                 isAutoScanning = false;
                 isDecreasing = false;
-                
-                // Trigger the first single tap immediately
-                currentFrequency += frequencyStep;
-                if (currentFrequency > maxFrequency) currentFrequency = minFrequency;
-                UpdateDisplay();
-                
+                StepFrequency(frequencyStep, "Tune Up", attemptManualLock: true, snapToStep: true);
                 holdTimer = 0f;
                 changeTimer = 0f;
             }
@@ -307,15 +307,9 @@ namespace WatchOut
             if (value)
             {
                 TryBeginRadioScan();
-                manualSignalLockArmed = true;
                 isAutoScanning = false;
                 isIncreasing = false;
-                
-                // Trigger the first single tap immediately
-                currentFrequency -= frequencyStep;
-                if (currentFrequency < minFrequency) currentFrequency = maxFrequency;
-                UpdateDisplay();
-                
+                StepFrequency(-frequencyStep, "Tune Down", attemptManualLock: true, snapToStep: true);
                 holdTimer = 0f;
                 changeTimer = 0f;
             }
@@ -330,18 +324,13 @@ namespace WatchOut
 
             TryBeginRadioScan();
             isAutoScanning = !isAutoScanning;
-
-            if (isAutoScanning)
-            {
-                manualSignalLockArmed = false;
-            }
         }
 
         private void UpdateDisplay()
         {
             if (frequencyDisplayText != null)
             {
-                frequencyDisplayText.text = currentFrequency.ToString("F1") + " FM";
+                frequencyDisplayText.text = DisplayedFrequency.ToString("F1") + " FM";
             }
         }
 
@@ -404,7 +393,6 @@ namespace WatchOut
             isIncreasing = false;
             isDecreasing = false;
             isAutoScanning = false;
-            manualSignalLockArmed = false;
             holdTimer = 0f;
             changeTimer = 0f;
         }
@@ -472,11 +460,13 @@ namespace WatchOut
             {
                 Transform current = frequencyDisplayText.transform.parent;
                 while (current != null && poweredScreenRenderer == null)
-                {
-                    poweredScreenRenderer = current.GetComponent<Renderer>();
-                    current = current.parent;
-                }
+            {
+                poweredScreenRenderer = current.GetComponent<Renderer>();
+                current = current.parent;
             }
+        }
+
+            RefreshSubscriptions();
         }
 
         private void TryBeginRadioScan()
@@ -505,10 +495,13 @@ namespace WatchOut
             {
                 currentFrequency = minFrequency;
                 currentLockedEvent = null;
+                pendingResolvedEvent = null;
                 UpdateDisplay();
             }
 
             RefreshPowerState();
+            LogActiveEventIfChanged();
+            LogLockMatchIfChanged();
         }
 
         private bool TryGetActiveSignal(
@@ -570,7 +563,6 @@ namespace WatchOut
         private void TriggerHiddenTestSignalLock(float lockTolerance)
         {
             hiddenSignalLocked = true;
-            manualSignalLockArmed = false;
 
             if (exactLockAudioSource != null && exactLockClip != null)
             {
@@ -585,35 +577,226 @@ namespace WatchOut
             }
         }
 
-        private void HandleDebugLoopCompletion(bool eventFoundNow)
+        private void HandleDialogueEnded(DialogueConversation conversation)
         {
-            if (!eventFoundNow ||
-                progressionManager == null ||
-                !progressionManager.PowerDownGeneratorAndRadioAfterDialogueInTestBuild)
+            if (pendingResolvedEvent == null || conversation == null)
             {
                 return;
             }
 
-            if (pendingDebugLoopRoutine != null)
+            if (pendingResolvedEvent.DialogueConversation != conversation)
             {
-                StopCoroutine(pendingDebugLoopRoutine);
+                return;
             }
 
-            pendingDebugLoopRoutine = StartCoroutine(CompleteDebugLoopAfterDialogueRoutine());
+            RadioEventData resolvedEvent = pendingResolvedEvent;
+            pendingResolvedEvent = null;
+            currentLockedEvent = null;
+            progressionManager?.MarkRadioEventFound(resolvedEvent);
+            RefreshPowerState();
+            LogActiveEventIfChanged();
+            LogLockMatchIfChanged();
         }
 
-        private IEnumerator CompleteDebugLoopAfterDialogueRoutine()
+        private void StepFrequency(float delta, string inputSource, bool attemptManualLock, bool snapToStep)
         {
-            while (dialogueRunner != null && dialogueRunner.IsRunning)
+            currentFrequency = WrapFrequency(currentFrequency + delta);
+
+            if (snapToStep)
             {
-                yield return null;
+                currentFrequency = Mathf.Round(currentFrequency * 10f) / 10f;
             }
 
-            pendingDebugLoopRoutine = null;
+            UpdateDisplay();
+            LogLockMatchIfChanged();
 
-            progressionManager.CompleteDebugRadioLoopAfterDialogue();
-            generatorInteractable?.SetPowerState(false);
-            RefreshPowerState();
+            if (attemptManualLock)
+            {
+                TryLockCurrentFrequencyIfPossible(inputSource);
+            }
+        }
+
+        private void TryLockCurrentFrequencyIfPossible(string inputSource)
+        {
+            if (isAutoScanning || pendingResolvedEvent != null || currentLockedEvent != null)
+            {
+                return;
+            }
+
+            if (progressionManager == null || !progressionManager.CanUseRadioControls)
+            {
+                Debug.LogWarning($"RadioSystem ignored {inputSource} because radio controls are not currently enabled.", this);
+                return;
+            }
+
+            if (!TryGetActiveSignal(out float targetFrequency, out _, out float lockTolerance, out RadioEventData closestEvent) ||
+                closestEvent == null)
+            {
+                Debug.LogWarning($"RadioSystem could not find an active jam event after {inputSource}.", this);
+                return;
+            }
+
+            if (!IsFrequencyWithinLockWindow(currentFrequency, targetFrequency, lockTolerance))
+            {
+                LogFailedManualLock(inputSource, closestEvent, targetFrequency, lockTolerance);
+                return;
+            }
+
+            LockOnSignal(closestEvent);
+        }
+
+        private bool IsFrequencyWithinLockWindow(float tunedFrequency, float targetFrequency, float baseTolerance)
+        {
+            int tunedBucket = Mathf.RoundToInt(tunedFrequency * 10f);
+            int targetBucket = Mathf.RoundToInt(targetFrequency * 10f);
+            if (tunedBucket == targetBucket)
+            {
+                return true;
+            }
+
+            float effectiveTolerance = Mathf.Max(baseTolerance, (frequencyStep * 0.5f) + 0.005f);
+            return Mathf.Abs(targetFrequency - tunedFrequency) <= effectiveTolerance;
+        }
+
+        private float WrapFrequency(float frequency)
+        {
+            if (frequency > maxFrequency)
+            {
+                return minFrequency;
+            }
+
+            if (frequency < minFrequency)
+            {
+                return maxFrequency;
+            }
+
+            return frequency;
+        }
+
+        private void RefreshSubscriptions(bool clearOnly = false)
+        {
+            if (subscribedProgressionManager != null)
+            {
+                subscribedProgressionManager.StateChanged -= HandleProgressionStateChanged;
+                subscribedProgressionManager = null;
+            }
+
+            if (subscribedDialogueRunner != null)
+            {
+                subscribedDialogueRunner.ConversationEnded -= HandleDialogueEnded;
+                subscribedDialogueRunner = null;
+            }
+
+            if (subscribedGeneratorInteractable != null)
+            {
+                subscribedGeneratorInteractable.StateChanged -= HandleGeneratorStateChanged;
+                subscribedGeneratorInteractable = null;
+            }
+
+            if (clearOnly || !isActiveAndEnabled)
+            {
+                return;
+            }
+
+            if (progressionManager != null)
+            {
+                progressionManager.StateChanged += HandleProgressionStateChanged;
+                subscribedProgressionManager = progressionManager;
+            }
+
+            if (dialogueRunner != null)
+            {
+                dialogueRunner.ConversationEnded += HandleDialogueEnded;
+                subscribedDialogueRunner = dialogueRunner;
+            }
+
+            if (generatorInteractable != null)
+            {
+                generatorInteractable.StateChanged += HandleGeneratorStateChanged;
+                subscribedGeneratorInteractable = generatorInteractable;
+            }
+        }
+
+        private void LogActiveEventIfChanged()
+        {
+            RadioEventData activeEvent = null;
+            if (progressionManager != null && progressionManager.ActiveRadioEventsToday.Count > 0)
+            {
+                activeEvent = progressionManager.ActiveRadioEventsToday[0];
+            }
+
+            if (activeEvent == lastLoggedActiveEvent)
+            {
+                return;
+            }
+
+            lastLoggedActiveEvent = activeEvent;
+
+            if (activeEvent == null)
+            {
+                Debug.Log($"RadioSystem has no active jam event during step {progressionManager?.CurrentObjectiveStep.ToString() ?? "Unknown"}.", this);
+                return;
+            }
+
+            Debug.Log(
+                $"RadioSystem active jam event is now '{activeEvent.EventName}' at {activeEvent.TargetFrequency:F1} FM during step {progressionManager?.CurrentObjectiveStep.ToString() ?? "Unknown"}.",
+                this);
+        }
+
+        public bool IsCurrentFrequencyLockMatch(out RadioEventData activeEvent, out float targetFrequency)
+        {
+            activeEvent = ActiveJamEvent;
+            targetFrequency = activeEvent != null ? activeEvent.TargetFrequency : 0f;
+
+            if (activeEvent == null)
+            {
+                return false;
+            }
+
+            float effectiveTolerance = Mathf.Max(signalLockTolerance, (frequencyStep * 0.5f) + 0.005f);
+            return IsFrequencyWithinLockWindow(currentFrequency, targetFrequency, effectiveTolerance);
+        }
+
+        public string GetDebugStateSummary()
+        {
+            bool isLockMatch = IsCurrentFrequencyLockMatch(out _, out float targetFrequency);
+            return
+                $"Internal Frequency: {currentFrequency:F3} FM\n" +
+                $"Displayed Frequency: {DisplayedFrequency:F1} FM\n" +
+                $"Scan Active: {(isAutoScanning ? "Yes" : "No")}\n" +
+                $"Lock Match: {(isLockMatch ? "Yes" : "No")}";
+        }
+
+        private void LogLockMatchIfChanged()
+        {
+            bool isLockMatch = IsCurrentFrequencyLockMatch(out RadioEventData activeEvent, out float targetFrequency);
+            if (isLockMatch == lastLoggedLockMatch)
+            {
+                return;
+            }
+
+            lastLoggedLockMatch = isLockMatch;
+            Debug.Log(
+                $"RadioSystem lock match changed to {(isLockMatch ? "true" : "false")} at {currentFrequency:F3} FM. Active event: {(activeEvent != null ? activeEvent.EventName : "None")} ({targetFrequency:F1} FM).",
+                this);
+        }
+
+        private void LogFailedManualLock(string inputSource, RadioEventData activeEvent, float targetFrequency, float lockTolerance)
+        {
+            if (activeEvent == null)
+            {
+                return;
+            }
+
+            float distanceToTarget = Mathf.Abs(targetFrequency - currentFrequency);
+            if (distanceToTarget > Mathf.Max(signalFadeRange, 0.5f))
+            {
+                return;
+            }
+
+            Debug.Log(
+                $"RadioSystem manual tune '{inputSource}' at {currentFrequency:F3} FM did not lock. Active event: {(activeEvent != null ? activeEvent.EventName : "None")} at {targetFrequency:F1} FM. Effective display: {DisplayedFrequency:F1} FM. Tolerance: {lockTolerance:F3}.",
+                this);
         }
 
         private AudioSource EnsureLoopSource(AudioSource source, string childName, AudioClip clip)

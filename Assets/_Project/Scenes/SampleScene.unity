@@ -119,6 +119,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!82 &137094510 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 8026736892114348009, guid: 7d1e567ec0c52cc449f711b72adbbeb3, type: 3}
+  m_PrefabInstance: {fileID: 1073686714}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &276249902
 GameObject:
   m_ObjectHideFlags: 0
@@ -582,6 +587,11 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!82 &559663333 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 5793348403362278267, guid: 7d1e567ec0c52cc449f711b72adbbeb3, type: 3}
+  m_PrefabInstance: {fileID: 1073686714}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &714668127
 GameObject:
   m_ObjectHideFlags: 0
@@ -1013,10 +1023,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1532179991184470073, guid: 7d1e567ec0c52cc449f711b72adbbeb3, type: 3}
-      propertyPath: m_Name
-      value: Screen
-      objectReference: {fileID: 0}
     - target: {fileID: 1589764491966797734, guid: 7d1e567ec0c52cc449f711b72adbbeb3, type: 3}
       propertyPath: m_LocalPosition.x
       value: -2.82
@@ -1138,10 +1144,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PrototypeGenerator
       objectReference: {fileID: 0}
-    - target: {fileID: 1140000000000000001, guid: 46b3fe74e9d54d3ca7d35b6d39b8102c, type: 3}
-      propertyPath: startsOn
-      value: 1
-      objectReference: {fileID: 0}
+    - target: {fileID: 2436465528904845080, guid: 46b3fe74e9d54d3ca7d35b6d39b8102c, type: 3}
+      propertyPath: progressionManager
+      value: 
+      objectReference: {fileID: 910000003}
     - target: {fileID: 4000000000000000001, guid: 46b3fe74e9d54d3ca7d35b6d39b8102c, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.09101477
@@ -1185,36 +1191,14 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1000000000000000001, guid: 46b3fe74e9d54d3ca7d35b6d39b8102c, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1086935008}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 46b3fe74e9d54d3ca7d35b6d39b8102c, type: 3}
---- !u!1 &1086935007 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1000000000000000001, guid: 46b3fe74e9d54d3ca7d35b6d39b8102c, type: 3}
-  m_PrefabInstance: {fileID: 1086935006}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1086935008
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1086935007}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4ba4bed4950e49deba9fb9ad1f811bdf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProgressionGeneratorBridge
-  progressionManager: {fileID: 910000003}
-  generatorInteractable: {fileID: 1086935009}
 --- !u!114 &1086935009 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1140000000000000001, guid: 46b3fe74e9d54d3ca7d35b6d39b8102c, type: 3}
   m_PrefabInstance: {fileID: 1086935006}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1086935007}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 027d917ae35d20946a0b3c29a8df3d43, type: 3}
@@ -1681,6 +1665,86 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1385935887 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2351053970211649399, guid: 753f37c00cd2343488b36f62a71f5e5d, type: 3}
+  m_PrefabInstance: {fileID: 1509556920}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8826744c603240c468a2373e358c9cf8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WatchOut.RadioSystem
+--- !u!82 &1393876314 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 2446305667902255669, guid: 7d1e567ec0c52cc449f711b72adbbeb3, type: 3}
+  m_PrefabInstance: {fileID: 1073686714}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1426777187
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1426777188}
+  - component: {fileID: 1426777189}
+  m_Layer: 0
+  m_Name: ProgressionObjectiveUI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1426777188
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1426777187}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1704582131}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1426777189
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1426777187}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf3191810d7548f47b7ad74fcb1d3b04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProgressionObjectiveUI
+  progressionManager: {fileID: 910000003}
+  radioSystem: {fileID: 1385935887}
+  overlayCanvas: {fileID: 0}
+  canvasScaler: {fileID: 0}
+  canvasGroup: {fileID: 0}
+  objectiveLabel: {fileID: 0}
+  debugLabel: {fileID: 0}
+  objectiveFont: {fileID: 0}
+  sortingOrder: 115
+  referenceResolution: {x: 1920, y: 1080}
+  anchoredPosition: {x: 22, y: -22}
+  size: {x: 520, y: 110}
+  textColor: {r: 0.92, g: 0.92, b: 0.92, a: 1}
+  outlineColor: {r: 0, g: 0, b: 0, a: 0.9}
+  fontSize: 28
+  debugFontSize: 18
 --- !u!1001 &1509556920
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1694,6 +1758,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 8300000, guid: c5dedc7c69577b54e92736d751d8b7f0, type: 3}
     - target: {fileID: 2351053970211649399, guid: 753f37c00cd2343488b36f62a71f5e5d, type: 3}
+      propertyPath: dialogueRunner
+      value: 
+      objectReference: {fileID: 1704582132}
+    - target: {fileID: 2351053970211649399, guid: 753f37c00cd2343488b36f62a71f5e5d, type: 3}
       propertyPath: staticLoopClip
       value: 
       objectReference: {fileID: 8300000, guid: bc5440ce8152d5b488a378009ee67e91, type: 3}
@@ -1704,31 +1772,39 @@ PrefabInstance:
     - target: {fileID: 2351053970211649399, guid: 753f37c00cd2343488b36f62a71f5e5d, type: 3}
       propertyPath: staticAudioSource
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 137094510}
     - target: {fileID: 2351053970211649399, guid: 753f37c00cd2343488b36f62a71f5e5d, type: 3}
       propertyPath: nearSignalLoopClip
       value: 
       objectReference: {fileID: 8300000, guid: abbe2165ee359b140b441bac0dcc797b, type: 3}
     - target: {fileID: 2351053970211649399, guid: 753f37c00cd2343488b36f62a71f5e5d, type: 3}
+      propertyPath: progressionManager
+      value: 
+      objectReference: {fileID: 910000003}
+    - target: {fileID: 2351053970211649399, guid: 753f37c00cd2343488b36f62a71f5e5d, type: 3}
       propertyPath: maxNearSignalVolume
       value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 2351053970211649399, guid: 753f37c00cd2343488b36f62a71f5e5d, type: 3}
-      propertyPath: useHiddenTestSignal
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2351053970211649399, guid: 753f37c00cd2343488b36f62a71f5e5d, type: 3}
       propertyPath: exactLockAudioSource
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1393876314}
     - target: {fileID: 2351053970211649399, guid: 753f37c00cd2343488b36f62a71f5e5d, type: 3}
       propertyPath: frequencyDisplayText
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1873665938}
+    - target: {fileID: 2351053970211649399, guid: 753f37c00cd2343488b36f62a71f5e5d, type: 3}
+      propertyPath: generatorInteractable
+      value: 
+      objectReference: {fileID: 1086935009}
     - target: {fileID: 2351053970211649399, guid: 753f37c00cd2343488b36f62a71f5e5d, type: 3}
       propertyPath: nearSignalAudioSource
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 559663333}
+    - target: {fileID: 2351053970211649399, guid: 753f37c00cd2343488b36f62a71f5e5d, type: 3}
+      propertyPath: poweredScreenRenderer
+      value: 
+      objectReference: {fileID: 1989965269}
     - target: {fileID: 2351053970211649399, guid: 753f37c00cd2343488b36f62a71f5e5d, type: 3}
       propertyPath: dialogueAudioDuckMultiplier
       value: 1
@@ -1948,11 +2024,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 3361206437226651142, guid: a421970b3ad783e4282f306061810f9b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1426777188}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1845872093932976244, guid: a421970b3ad783e4282f306061810f9b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1704582126}
+    - targetCorrespondingSourceObject: {fileID: 1845872093932976244, guid: a421970b3ad783e4282f306061810f9b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1704582132}
   m_SourcePrefab: {fileID: 100100000, guid: a421970b3ad783e4282f306061810f9b, type: 3}
 --- !u!1 &1704582125 stripped
 GameObject:
@@ -1973,6 +2055,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProgressionSleepBridge
   progressionManager: {fileID: 910000003}
   sleepController: {fileID: 0}
+--- !u!4 &1704582131 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3361206437226651142, guid: a421970b3ad783e4282f306061810f9b, type: 3}
+  m_PrefabInstance: {fileID: 1704582124}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1704582132
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1704582125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d6acc506ecee754bb0fff1a11f5aac0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueRunner
+  playerInput: {fileID: 0}
+  interactionController: {fileID: 0}
+  playerController: {fileID: 0}
+  dialogueUI: {fileID: 0}
+  typewriter: {fileID: 0}
+  voicePlayer: {fileID: 0}
+  cameraShake: {fileID: 0}
+  keyboardAdvanceKey: 1
+  keyboardAlternateAdvanceKey: 0
+  gamepadAdvanceButton: 4
+  charactersPerSecond: 60
 --- !u!1 &1746520726
 GameObject:
   m_ObjectHideFlags: 0
@@ -2310,6 +2420,28 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1849530786 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 410000000000000003, guid: a57cf3e945f44f31854fc47382fe54f0, type: 3}
+  m_PrefabInstance: {fileID: 2137860052}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d94f3ffb89e9423e90cd4012f4cd3140, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CassettePlayerReceiver
+--- !u!114 &1873665938 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2791968411441493410, guid: 7d1e567ec0c52cc449f711b72adbbeb3, type: 3}
+  m_PrefabInstance: {fileID: 1073686714}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshPro
 --- !u!1001 &1901002215
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2318,6 +2450,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1247727502098278205, guid: 40de0645634a9e442a444b8bca854145, type: 3}
+      propertyPath: progressionManager
+      value: 
+      objectReference: {fileID: 910000003}
     - target: {fileID: 1607419250942982055, guid: 40de0645634a9e442a444b8bca854145, type: 3}
       propertyPath: m_Name
       value: PrototypeBed
@@ -2369,38 +2505,14 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1607419250942982055, guid: 40de0645634a9e442a444b8bca854145, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1901002217}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 40de0645634a9e442a444b8bca854145, type: 3}
---- !u!1 &1901002216 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1607419250942982055, guid: 40de0645634a9e442a444b8bca854145, type: 3}
-  m_PrefabInstance: {fileID: 1901002215}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1901002217
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1901002216}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d9d2cde23721fc4dba9ca301478d70b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProgressionInteractablePhaseGate
-  progressionManager: {fileID: 910000003}
-  targetInteractable: {fileID: 1901002218}
-  unlockWhenManagerMissing: 1
-  allowedPhases: 0400000005000000
 --- !u!114 &1901002218 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8364074423108407797, guid: 40de0645634a9e442a444b8bca854145, type: 3}
   m_PrefabInstance: {fileID: 1901002215}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1901002216}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cf02b98be11293a40a94aa3e7a8a7ff5, type: 3}
@@ -2518,6 +2630,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!23 &1989965269 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 8389017740089411626, guid: 7d1e567ec0c52cc449f711b72adbbeb3, type: 3}
+  m_PrefabInstance: {fileID: 1073686714}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2055644352
 GameObject:
   m_ObjectHideFlags: 0
@@ -2694,6 +2811,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 23.326
       objectReference: {fileID: 0}
+    - target: {fileID: 410000000000000003, guid: a57cf3e945f44f31854fc47382fe54f0, type: 3}
+      propertyPath: dialogueRunner
+      value: 
+      objectReference: {fileID: 1704582132}
+    - target: {fileID: 410000000000000003, guid: a57cf3e945f44f31854fc47382fe54f0, type: 3}
+      propertyPath: progressionManager
+      value: 
+      objectReference: {fileID: 910000003}
+    - target: {fileID: 3908288349577088237, guid: a57cf3e945f44f31854fc47382fe54f0, type: 3}
+      propertyPath: progressionManager
+      value: 
+      objectReference: {fileID: 910000003}
     - target: {fileID: 5962476514093266493, guid: a57cf3e945f44f31854fc47382fe54f0, type: 3}
       propertyPath: m_Size.x
       value: 0.25169215
@@ -2724,17 +2853,25 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 3363507205731958488, guid: 2e9360f7268f6014cb1e11e3873d68eb, type: 3}
-      propertyPath: debugSetPhase
-      value: 5
-      objectReference: {fileID: 0}
+      propertyPath: dialogueRunner
+      value: 
+      objectReference: {fileID: 1704582132}
+    - target: {fileID: 3363507205731958488, guid: 2e9360f7268f6014cb1e11e3873d68eb, type: 3}
+      propertyPath: sleepBedInteractable
+      value: 
+      objectReference: {fileID: 1901002218}
+    - target: {fileID: 3363507205731958488, guid: 2e9360f7268f6014cb1e11e3873d68eb, type: 3}
+      propertyPath: generatorInteractable
+      value: 
+      objectReference: {fileID: 1086935009}
+    - target: {fileID: 3363507205731958488, guid: 2e9360f7268f6014cb1e11e3873d68eb, type: 3}
+      propertyPath: cassettePlayerReceiver
+      value: 
+      objectReference: {fileID: 1849530786}
     - target: {fileID: 3363507205731958488, guid: 2e9360f7268f6014cb1e11e3873d68eb, type: 3}
       propertyPath: debugGeneratorInteractable
       value: 
       objectReference: {fileID: 1086935009}
-    - target: {fileID: 3363507205731958488, guid: 2e9360f7268f6014cb1e11e3873d68eb, type: 3}
-      propertyPath: allowRadioDebugWithoutCassette
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3640567158149069554, guid: 2e9360f7268f6014cb1e11e3873d68eb, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -2796,6 +2933,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: CassetteShelf1
       objectReference: {fileID: 0}
+    - target: {fileID: 436550064500711009, guid: 5d511aace7f05aa438e1bd36e391d8c3, type: 3}
+      propertyPath: prompt
+      value: Pick Cassette
+      objectReference: {fileID: 0}
+    - target: {fileID: 629921595083571323, guid: 5d511aace7f05aa438e1bd36e391d8c3, type: 3}
+      propertyPath: prompt
+      value: WIP
+      objectReference: {fileID: 0}
     - target: {fileID: 5727493093223521778, guid: 5d511aace7f05aa438e1bd36e391d8c3, type: 3}
       propertyPath: m_LocalScale.x
       value: 16.166185
@@ -2847,6 +2992,22 @@ PrefabInstance:
     - target: {fileID: 5727493093223521778, guid: 5d511aace7f05aa438e1bd36e391d8c3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: -180
+      objectReference: {fileID: 0}
+    - target: {fileID: 8514839434243645266, guid: 5d511aace7f05aa438e1bd36e391d8c3, type: 3}
+      propertyPath: slotMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8514839434243645266, guid: 5d511aace7f05aa438e1bd36e391d8c3, type: 3}
+      propertyPath: cassetteData
+      value: 
+      objectReference: {fileID: 11400000, guid: 34ebf78b414f41b1bbcf36c6a62b1c34, type: 2}
+    - target: {fileID: 8690197927691567432, guid: 5d511aace7f05aa438e1bd36e391d8c3, type: 3}
+      propertyPath: slotMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8690197927691567432, guid: 5d511aace7f05aa438e1bd36e391d8c3, type: 3}
+      propertyPath: cassetteData
+      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

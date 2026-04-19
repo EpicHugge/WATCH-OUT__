@@ -28,6 +28,8 @@ public sealed class ProgressionManagerEditor : Editor
             EditorGUILayout.LabelField("Current State", EditorStyles.boldLabel);
             EditorGUILayout.LabelField("Day", manager.CurrentDay.ToString());
             EditorGUILayout.LabelField("Phase", manager.CurrentPhase.ToString());
+            EditorGUILayout.LabelField("Step", manager.CurrentObjectiveStep.ToString());
+            EditorGUILayout.LabelField("Objective", manager.CurrentObjectiveText);
             EditorGUILayout.LabelField("Generator Started", manager.GeneratorStartedToday ? "Yes" : "No");
             EditorGUILayout.LabelField("Power Out", manager.PowerOutTriggeredToday ? "Yes" : "No");
             EditorGUILayout.ObjectField("Day Data", manager.CurrentDayData, typeof(DayData), false);

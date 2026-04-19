@@ -44,18 +44,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8826744c603240c468a2373e358c9cf8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WatchOut.RadioSystem
-  progressionManager: {fileID: 3363507205731958488, guid: 2e9360f7268f6014cb1e11e3873d68eb, type: 3}
+  progressionManager: {fileID: 0}
   dialogueRunner: {fileID: 0}
+  generatorInteractable: {fileID: 0}
   frequencyDisplayText: {fileID: 0}
+  poweredScreenRenderer: {fileID: 0}
+  screenPoweredColor: {r: 0.12, g: 0.36, b: 0.18, a: 1}
+  screenUnpoweredColor: {r: 0.02, g: 0.04, b: 0.03, a: 1}
   staticAudioSource: {fileID: 0}
-  broadcastAudioSource: {fileID: 0}
-  maxStaticVolume: 0.5
-  maxBroadcastVolume: 1
+  maxStaticVolume: 0.005
+  nearSignalAudioSource: {fileID: 0}
+  exactLockAudioSource: {fileID: 0}
+  staticLoopClip: {fileID: 8300000, guid: bc5440ce8152d5b488a378009ee67e91, type: 3}
+  nearSignalLoopClip: {fileID: 8300000, guid: abbe2165ee359b140b441bac0dcc797b, type: 3}
+  exactLockClip: {fileID: 8300000, guid: c5dedc7c69577b54e92736d751d8b7f0, type: 3}
+  maxNearSignalVolume: 0.7
+  dialogueAudioDuckMultiplier: 1
   minFrequency: 87.5
   maxFrequency: 108
   frequencyStep: 0.1
   continuousChangeSpeed: 10
+  maxContinuousChangeSpeed: 20
   holdDelay: 0.5
+  holdAccelerationDuration: 1.25
   autoScanSpeed: 2
   signalFadeRange: 0.5
   signalLockTolerance: 0.05
+  useHiddenTestSignal: 0
+  hiddenTestTargetFrequency: 94.3
+  hiddenTestProximityRange: 0.5
+  hiddenTestExactTolerance: 0.05
