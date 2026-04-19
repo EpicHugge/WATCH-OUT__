@@ -19,8 +19,7 @@ MonoBehaviour:
   lines:
   - speakerPreset: {fileID: 0}
     speakerName: Event 4
-    dialogueText: This is the last message. Power down, stay quiet, and sleep until
-      morning never comes.
+    dialogueText: Alot of lore and stuff. Very deep <wave>narrative... :)</wave>
     overrideTextEffect: 0
     textEffect: 0
     overrideSpeakerNameColor: 0

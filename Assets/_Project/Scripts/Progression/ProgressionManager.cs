@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -120,6 +123,11 @@ public sealed class ProgressionManager : MonoBehaviour
     private void Update()
     {
         HandleDebugInput();
+
+        if (gameJamCompleted)
+        {
+            HandleGameCompleteQuitInput();
+        }
 
         if (!Application.isPlaying || powerOutTriggeredToday || currentPhase != DayPhase.ScanningRadio)
         {
@@ -607,6 +615,34 @@ public sealed class ProgressionManager : MonoBehaviour
         }
 
         DebugForceStartPower();
+    }
+
+    private void HandleGameCompleteQuitInput()
+    {
+        if (!WasGameCompleteQuitPressedThisFrame())
+        {
+            return;
+        }
+
+#if UNITY_EDITOR
+        EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+    }
+
+    private bool WasGameCompleteQuitPressedThisFrame()
+    {
+#if ENABLE_INPUT_SYSTEM
+        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            return true;
+        }
+
+        return Gamepad.current != null && Gamepad.current.buttonEast.wasPressedThisFrame;
+#else
+        return Input.GetKeyDown(KeyCode.Escape);
+#endif
     }
 
     private bool WasDebugInstantPowerKeyPressed()
