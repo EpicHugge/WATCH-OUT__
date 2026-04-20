@@ -1,10 +1,12 @@
 using UnityEngine;
 using UnityEngine.Events;
+using System;
 
 [DisallowMultipleComponent]
 public sealed class GeneratorInteractable : InteractableBase
 {
     [Header("Generator")]
+    [SerializeField] private ProgressionManager progressionManager;
     [SerializeField] private bool startsOn;
     [SerializeField] private string turnOnPrompt = "Turn On Generator";
     [SerializeField] private string turnOffPrompt = "Turn Off Generator";
@@ -26,15 +28,40 @@ public sealed class GeneratorInteractable : InteractableBase
     private Quaternion onLeverRotation;
 
     public bool IsOn => isOn;
+    public event Action TurnedOn;
+    public event Action TurnedOff;
+    public event Action<bool> StateChanged;
 
     protected override void Awake()
     {
         base.Awake();
+        ResolveReferences();
         offLeverRotation = Quaternion.Euler(offLeverLocalEulerAngles);
         onLeverRotation = Quaternion.Euler(onLeverLocalEulerAngles);
         isOn = startsOn;
         ApplyVisualState();
         ApplyLeverStateImmediate();
+        RefreshAvailabilityState();
+    }
+
+    private void OnEnable()
+    {
+        ResolveReferences();
+
+        if (progressionManager != null)
+        {
+            progressionManager.StateChanged += HandleProgressionStateChanged;
+        }
+
+        RefreshAvailabilityState();
+    }
+
+    private void OnDisable()
+    {
+        if (progressionManager != null)
+        {
+            progressionManager.StateChanged -= HandleProgressionStateChanged;
+        }
     }
 
     private void Update()
@@ -60,17 +87,63 @@ public sealed class GeneratorInteractable : InteractableBase
 
     protected override void InteractInternal(PlayerInteractionController interactor)
     {
-        isOn = !isOn;
+        SetPowerState(!isOn);
+    }
+
+    public bool SetPowerState(bool value)
+    {
+        if (isOn == value)
+        {
+            return false;
+        }
+
+        isOn = value;
         ApplyVisualState();
 
         if (isOn)
         {
+            progressionManager?.StartGenerator();
             onTurnedOn?.Invoke();
+            TurnedOn?.Invoke();
         }
         else
         {
             onTurnedOff?.Invoke();
+            TurnedOff?.Invoke();
         }
+
+        StateChanged?.Invoke(isOn);
+        RefreshAvailabilityState();
+        return true;
+    }
+
+    private void ResolveReferences()
+    {
+        if (progressionManager == null)
+        {
+            progressionManager = FindAnyObjectByType<ProgressionManager>();
+        }
+    }
+
+    private void HandleProgressionStateChanged()
+    {
+        RefreshAvailabilityState();
+    }
+
+    private void RefreshAvailabilityState()
+    {
+        if (progressionManager == null)
+        {
+            return;
+        }
+
+        if (progressionManager.UnlockAllInteractionsForDebug)
+        {
+            SetLocked(false);
+            return;
+        }
+
+        SetLocked(!progressionManager.CanInteractWithGenerator);
     }
 
     private void ApplyVisualState()

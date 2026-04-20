@@ -1,0 +1,191 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7929567495511250229
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3520990801836921005}
+  - component: {fileID: 399152049366362133}
+  - component: {fileID: 5318600072560130618}
+  - component: {fileID: 4173517666909797129}
+  m_Layer: 3
+  m_Name: CasetteTape
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3520990801836921005
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7929567495511250229}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 638.831, y: 318.523, z: 701.868}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 6180667909814115458}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &399152049366362133
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7929567495511250229}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.1, y: 0.15203857, z: 0.7}
+  m_Center: {x: 0, y: 0.004180908, z: 0}
+--- !u!114 &5318600072560130618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7929567495511250229}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf9e8e85d7df1824aacd1918d3b6b8fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HoverMoveInteractable
+  interactionEnabled: 1
+  startsLocked: 0
+  interactionVerb: Interact
+  interactionDisplayName: 
+  lockedPrompt: Locked
+  onLockedInteract:
+    m_PersistentCalls:
+      m_Calls: []
+  objectToMove: {fileID: 0}
+  hoverOffset: {x: 0, y: 0.01, z: -0.2}
+  moveSpeed: 10
+  prompt: Pick Cassette
+  onInteract:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4173517666909797129}
+        m_TargetAssemblyTypeName: CassetteShelfSlot, Assembly-CSharp
+        m_MethodName: HandleInteract
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &4173517666909797129
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7929567495511250229}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2223caabc5ed7c2409fc4636eca49f70, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CassetteShelfSlot
+  slotMode: 0
+  cassetteData: {fileID: 0}
+  cassettePlayerReceiver: {fileID: 0}
+  hoverInteractable: {fileID: 5318600072560130618}
+  interactionCollider: {fileID: 399152049366362133}
+  visualToHide: {fileID: 7929567495511250229}
+  functionalPrompt: Pick Cassette
+  workInProgressPrompt: WIP
+--- !u!1001 &5930288303900015465
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3520990801836921005}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 5810720beb244d9419962583d9ca0316, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 53.154
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5810720beb244d9419962583d9ca0316, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 53.154
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5810720beb244d9419962583d9ca0316, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 53.154
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5810720beb244d9419962583d9ca0316, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.005
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5810720beb244d9419962583d9ca0316, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.0033052
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5810720beb244d9419962583d9ca0316, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.004
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5810720beb244d9419962583d9ca0316, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.0000014603138
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5810720beb244d9419962583d9ca0316, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5810720beb244d9419962583d9ca0316, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5810720beb244d9419962583d9ca0316, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5810720beb244d9419962583d9ca0316, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -180
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5810720beb244d9419962583d9ca0316, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 5810720beb244d9419962583d9ca0316, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 5810720beb244d9419962583d9ca0316, type: 3}
+      propertyPath: m_Name
+      value: CassetteTape
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5810720beb244d9419962583d9ca0316, type: 3}
+--- !u!4 &6180667909814115458 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5810720beb244d9419962583d9ca0316, type: 3}
+  m_PrefabInstance: {fileID: 5930288303900015465}
+  m_PrefabAsset: {fileID: 0}

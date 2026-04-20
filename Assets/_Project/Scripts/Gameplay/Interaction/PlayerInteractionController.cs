@@ -5,6 +5,9 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(PlayerInput))]
 public sealed class PlayerInteractionController : MonoBehaviour
 {
+    private const string GamepadInteractLabel = "Square / X";
+    private const string InteractActionName = "Interact";
+
     [Header("Detection")]
     [SerializeField] private Camera interactionCamera;
     [SerializeField] private LayerMask interactableLayers;
@@ -17,9 +20,13 @@ public sealed class PlayerInteractionController : MonoBehaviour
     [SerializeField] private InteractionUI interactionUI;
     [SerializeField] private Font interactionPromptFont;
 
+    private PlayerInput playerInput;
+    private InputAction interactAction;
     private InteractableBase currentTarget;
     private RaycastHit currentTargetHit;
     private string currentPrompt = string.Empty;
+    private InteractionOutlineHighlight currentTargetHighlight;
+    private InteractableBase activeInteractable;
 
     public IInteractable CurrentTarget => currentTarget;
     public RaycastHit CurrentTargetHit => currentTargetHit;
@@ -27,6 +34,8 @@ public sealed class PlayerInteractionController : MonoBehaviour
 
     private void Awake()
     {
+        playerInput = GetComponent<PlayerInput>();
+
         if (interactionCamera == null)
         {
             interactionCamera = GetComponentInChildren<Camera>();
@@ -59,8 +68,18 @@ public sealed class PlayerInteractionController : MonoBehaviour
         ClearCurrentTarget();
     }
 
+    private void OnEnable()
+    {
+        CacheActions();
+    }
+
     private void OnDisable()
     {
+        if (activeInteractable != null)
+        {
+            activeInteractable.EndInteract(this);
+            activeInteractable = null;
+        }
         ClearCurrentTarget();
     }
 
@@ -68,15 +87,30 @@ public sealed class PlayerInteractionController : MonoBehaviour
     {
         if (!interactionEnabled)
         {
+            if (activeInteractable != null)
+            {
+                activeInteractable.EndInteract(this);
+                activeInteractable = null;
+            }
             ClearCurrentTarget();
             return;
         }
 
         UpdateCurrentTarget();
 
-        if (currentTarget != null && WasInteractPressedThisFrame())
+        if (activeInteractable != null)
         {
-            currentTarget.Interact(this);
+            if (WasInteractReleasedThisFrame() || currentTarget != activeInteractable)
+            {
+                activeInteractable.EndInteract(this);
+                activeInteractable = null;
+            }
+        }
+
+        if (currentTarget != null && activeInteractable == null && WasInteractPressedThisFrame())
+        {
+            activeInteractable = currentTarget;
+            activeInteractable.Interact(this);
             RefreshCurrentTarget();
         }
     }
@@ -92,6 +126,11 @@ public sealed class PlayerInteractionController : MonoBehaviour
 
         if (!interactionEnabled)
         {
+            if (activeInteractable != null)
+            {
+                activeInteractable.EndInteract(this);
+                activeInteractable = null;
+            }
             ClearCurrentTarget();
         }
     }
@@ -105,6 +144,13 @@ public sealed class PlayerInteractionController : MonoBehaviour
         }
 
         UpdateCurrentTarget(forceUiRefresh: true);
+    }
+
+    private void CacheActions()
+    {
+        interactAction = playerInput != null && playerInput.actions != null
+            ? playerInput.actions[InteractActionName]
+            : null;
     }
 
     private void UpdateCurrentTarget(bool forceUiRefresh = false)
@@ -144,18 +190,29 @@ public sealed class PlayerInteractionController : MonoBehaviour
             return;
         }
 
-        if (targetChanged && currentTarget != null)
+        if (targetChanged)
         {
-            currentTarget.SetHighlighted(false);
+            SetTargetHighlight(currentTarget, currentTargetHighlight, false);
+
+            if (currentTarget != null)
+            {
+                currentTarget.OnHoverExit(this);
+            }
         }
 
         currentTarget = nextTarget;
         currentTargetHit = nextHit;
         currentPrompt = nextPrompt;
+        currentTargetHighlight = currentTarget != null ? ResolveHighlight(currentTarget) : null;
 
-        if (targetChanged && currentTarget != null)
+        if (targetChanged)
         {
-            currentTarget.SetHighlighted(true);
+            SetTargetHighlight(currentTarget, currentTargetHighlight, true);
+
+            if (currentTarget != null)
+            {
+                currentTarget.OnHoverEnter(this);
+            }
         }
 
         if (interactionUI != null)
@@ -171,12 +228,64 @@ public sealed class PlayerInteractionController : MonoBehaviour
 
     private bool WasInteractPressedThisFrame()
     {
+        if (interactAction != null)
+        {
+            return interactAction.WasPressedThisFrame();
+        }
+
         return Keyboard.current != null && Keyboard.current[interactKey].wasPressedThisFrame;
+    }
+
+    private bool WasInteractReleasedThisFrame()
+    {
+        if (interactAction != null)
+        {
+            return interactAction.WasReleasedThisFrame();
+        }
+
+        return Keyboard.current != null && Keyboard.current[interactKey].wasReleasedThisFrame;
     }
 
     private string FormatPrompt(string prompt)
     {
-        return $"[{interactKey}] {prompt}";
+        string bindingLabel = GetInteractBindingLabel();
+        return string.IsNullOrWhiteSpace(bindingLabel) ? prompt : $"[{bindingLabel}] {prompt}";
+    }
+
+    private string GetInteractBindingLabel()
+    {
+        if (playerInput != null && playerInput.currentControlScheme == "Gamepad")
+        {
+            return GamepadInteractLabel;
+        }
+
+        return interactKey.ToString().ToUpperInvariant();
+    }
+
+    private static InteractionOutlineHighlight ResolveHighlight(InteractableBase interactable)
+    {
+        if (interactable == null)
+        {
+            return null;
+        }
+
+        InteractionOutlineHighlight highlight = interactable.GetComponent<InteractionOutlineHighlight>();
+        if (highlight == null)
+        {
+            highlight = interactable.gameObject.AddComponent<InteractionOutlineHighlight>();
+        }
+
+        return highlight;
+    }
+
+    private static void SetTargetHighlight(InteractableBase interactable, InteractionOutlineHighlight highlight, bool highlighted)
+    {
+        if (interactable == null || highlight == null)
+        {
+            return;
+        }
+
+        highlight.SetHighlighted(highlighted);
     }
 
     private static bool TryGetInteractable(Collider hitCollider, out InteractableBase interactable)

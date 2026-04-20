@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3928646474929217766
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3640567158149069554}
+  - component: {fileID: 3363507205731958488}
+  m_Layer: 0
+  m_Name: ProgressionManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3640567158149069554
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3928646474929217766}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3363507205731958488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3928646474929217766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b1fd479252091241a4c0990d109c2c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProgressionManager
+  days:
+  - {fileID: 11400000, guid: 56c75201429b481aaef9e90462b252f0, type: 2}
+  - {fileID: 11400000, guid: 499e5e2fc8c647429359d79690a01e02, type: 2}
+  startingDay: 1
+  autoStartOnPlay: 1
+  completeWakeUpImmediatelyOnSceneStart: 1
+  cassette1: {fileID: 11400000, guid: fed42875686645a9819166d7899d4b68, type: 2}
+  cassette2: {fileID: 11400000, guid: 34ebf78b414f41b1bbcf36c6a62b1c34, type: 2}
+  day1Event1: {fileID: 11400000, guid: cb7511835c4d443492d8a561ca5ee766, type: 2}
+  day1Event2: {fileID: 11400000, guid: 005832cf4ec84ccc88a0dee50c6c33eb, type: 2}
+  day2Event1: {fileID: 11400000, guid: 2ed2da40d4244a6db043a9740f5c024f, type: 2}
+  day2Event2: {fileID: 11400000, guid: 6866b17c1dbe4962a98b3a1c7f8d1926, type: 2}
+  dialogueRunner: {fileID: 0}
+  generatorInteractable: {fileID: 0}
+  cassettePlayerReceiver: {fileID: 0}
+  sleepBedInteractable: {fileID: 0}
+  frequencyMatchTolerance: 0.05
+  unlockAllInteractionsForDebug: 0
+  enableDebugInstantPowerKey: 0
+  debugInstantPowerKey: 119
+  debugGeneratorInteractable: {fileID: 0}
+  debugSetDay: 1
+  debugSetPhase: 1
+  debugTestCassette: {fileID: 11400000, guid: fed42875686645a9819166d7899d4b68, type: 2}
+  debugTestFrequency: 94.3

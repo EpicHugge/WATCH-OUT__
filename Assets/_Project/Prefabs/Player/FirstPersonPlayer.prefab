@@ -180,6 +180,8 @@ MonoBehaviour:
   backwardSpeedMultiplier: 0.72
   movementSmoothTime: 0.22
   airMovementSmoothTime: 0.38
+  jumpEnabled: 1
+  keyboardJumpKey: 1
   jumpHeight: 0.9
   gravity: -28
   groundedGravity: -2

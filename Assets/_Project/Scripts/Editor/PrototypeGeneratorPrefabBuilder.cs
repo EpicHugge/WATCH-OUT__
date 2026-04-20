@@ -93,7 +93,6 @@ public static class PrototypeGeneratorPrefabBuilder
             SetFieldValue(interactable, "leverMoveSpeed", 8f);
             SetFieldValue(interactable, "inactiveColor", new Color(0.2f, 0.04f, 0.04f, 1f));
             SetFieldValue(interactable, "activeColor", new Color(0.2f, 1f, 0.35f, 1f));
-
             PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
             Debug.Log($"Built prototype generator prefab at {PrefabPath}.");
         }
