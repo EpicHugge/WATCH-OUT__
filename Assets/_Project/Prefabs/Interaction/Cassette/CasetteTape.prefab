@@ -29,7 +29,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 638.831, y: 318.523, z: 701.868}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6180667909814115458}
@@ -68,18 +68,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf9e8e85d7df1824aacd1918d3b6b8fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HoverMoveInteractable
-  interactionEnabled: 1
-  startsLocked: 0
+  interactionEnabled: 0
   interactionVerb: Interact
   interactionDisplayName: 
-  lockedPrompt: Locked
-  onLockedInteract:
-    m_PersistentCalls:
-      m_Calls: []
   objectToMove: {fileID: 0}
   hoverOffset: {x: 0, y: 0.01, z: -0.2}
   moveSpeed: 10
-  prompt: Pick Cassette
+  prompt: Interact
   onInteract:
     m_PersistentCalls:
       m_Calls:
@@ -115,6 +110,10 @@ MonoBehaviour:
   visualToHide: {fileID: 7929567495511250229}
   functionalPrompt: Pick Cassette
   workInProgressPrompt: WIP
+  alreadyCarryingPrompt: Already Carrying Cassette
+  lockedPrompt: Locked
+  overrideDisplayName: 
+  overrideInteractionText: 
 --- !u!1001 &5930288303900015465
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -175,6 +174,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 5810720beb244d9419962583d9ca0316, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: ff8039bd2cec3dc45811feb23a191fb0, type: 2}
+    - target: {fileID: -5754084199372789682, guid: 5810720beb244d9419962583d9ca0316, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 7027636043351174211, guid: 4a3ffd95682d2a2419018280d3515579, type: 3}
     - target: {fileID: 919132149155446097, guid: 5810720beb244d9419962583d9ca0316, type: 3}
       propertyPath: m_Name
       value: CassetteTape

@@ -3,14 +3,16 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class CassetteShelfSlot : MonoBehaviour
 {
-    private enum SlotMode
+    public enum SlotMode
     {
-        Functional,
-        WorkInProgress
+        Normal,
+        WorkInProgress,
+        Locked,
+        Hidden
     }
 
     [Header("Setup")]
-    [SerializeField] private SlotMode slotMode = SlotMode.Functional;
+    [SerializeField] private SlotMode slotMode = SlotMode.Normal;
     [SerializeField] private CassetteData cassetteData;
     [SerializeField] private CassettePlayerReceiver cassettePlayerReceiver;
     [SerializeField] private HoverMoveInteractable hoverInteractable;
@@ -25,7 +27,13 @@ public sealed class CassetteShelfSlot : MonoBehaviour
     private bool hasBeenPickedUp;
     private CassettePlayerReceiver subscribedCassettePlayerReceiver;
 
+    [SerializeField] private string lockedPrompt = "Locked";
+    [SerializeField] private string overrideDisplayName = string.Empty;
+    [SerializeField] private string overrideInteractionText = string.Empty;
+
     public bool IsWorkInProgress => slotMode == SlotMode.WorkInProgress;
+    public bool IsLockedState => slotMode == SlotMode.Locked;
+    public bool IsHiddenState => slotMode == SlotMode.Hidden;
     public CassetteData CassetteData => cassetteData;
 
     private void Awake()
@@ -56,7 +64,7 @@ public sealed class CassetteShelfSlot : MonoBehaviour
 
     public void HandleInteract()
     {
-        if (hasBeenPickedUp || IsWorkInProgress || cassetteData == null)
+        if (hasBeenPickedUp || IsWorkInProgress || IsLockedState || cassetteData == null)
         {
             return;
         }
@@ -138,21 +146,30 @@ public sealed class CassetteShelfSlot : MonoBehaviour
             return;
         }
 
-        hoverInteractable.SetLocked(false);
         hoverInteractable.SetPrompt(ResolvePrompt());
-        hoverInteractable.SetInteractionEnabled(cassetteData != null || IsWorkInProgress);
+        hoverInteractable.SetInteractionEnabled(cassetteData != null || IsWorkInProgress || IsLockedState);
     }
 
     private string ResolvePrompt()
     {
+        if (IsHiddenState)
+        {
+            return string.Empty;
+        }
+
         if (IsWorkInProgress)
         {
-            return workInProgressPrompt;
+            return string.IsNullOrWhiteSpace(overrideInteractionText) ? workInProgressPrompt : overrideInteractionText.Trim();
+        }
+
+        if (IsLockedState)
+        {
+            return string.IsNullOrWhiteSpace(overrideInteractionText) ? lockedPrompt : overrideInteractionText.Trim();
         }
 
         if (cassetteData == null)
         {
-            return string.Empty;
+            return string.IsNullOrWhiteSpace(overrideInteractionText) ? string.Empty : overrideInteractionText.Trim();
         }
 
         if (cassettePlayerReceiver != null && !cassettePlayerReceiver.CanSelectCassette(cassetteData))
@@ -160,7 +177,7 @@ public sealed class CassetteShelfSlot : MonoBehaviour
             return alreadyCarryingPrompt;
         }
 
-        return functionalPrompt;
+        return string.IsNullOrWhiteSpace(overrideInteractionText) ? functionalPrompt : overrideInteractionText.Trim();
     }
 
     private void HandleCassetteLoaded(CassetteData cassette)
@@ -183,6 +200,41 @@ public sealed class CassetteShelfSlot : MonoBehaviour
         }
 
         RefreshAvailabilityState();
+    }
+
+    public void ApplyShelfDefinition(
+        CassetteData cassette,
+        SlotMode mode,
+        string displayNameOverride,
+        string interactionTextOverride,
+        CassettePlayerReceiver receiver)
+    {
+        cassetteData = cassette;
+        slotMode = mode;
+        overrideDisplayName = displayNameOverride ?? string.Empty;
+        overrideInteractionText = interactionTextOverride ?? string.Empty;
+        cassettePlayerReceiver = receiver;
+        hasBeenPickedUp = false;
+
+        ResolveReferences();
+        ApplyPrompt();
+        RefreshAvailabilityState();
+        SetVisualVisible(!IsHiddenState);
+
+        if (interactionCollider != null)
+        {
+            interactionCollider.enabled = !IsHiddenState;
+        }
+    }
+
+    public string ResolveDisplayName()
+    {
+        if (!string.IsNullOrWhiteSpace(overrideDisplayName))
+        {
+            return overrideDisplayName.Trim();
+        }
+
+        return cassetteData != null ? cassetteData.CassetteName : string.Empty;
     }
 
     private void SetVisualVisible(bool isVisible)
