@@ -118,7 +118,13 @@ MonoBehaviour:
   horizontalSpacing: 0.11
   verticalSpacing: 0.14
   depthOffset: 0
+  cassetteScale: {x: 0.3, y: 0.3, z: 0.3}
   cassetteRotationEuler: {x: 0, y: 0, z: 0}
+  hoverSlideDistance: 0.08
+  hoverSoundClip: {fileID: 8300000, guid: 08c194987ad57be4aa90e67afda9d4e3, type: 3}
+  hoverSoundVolume: 0.45
+  minHoverPitch: 0.92
+  maxHoverPitch: 1.08
   slots:
   - cassetteData: {fileID: 0}
     state: 0

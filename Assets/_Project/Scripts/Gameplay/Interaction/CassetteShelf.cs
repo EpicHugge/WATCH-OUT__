@@ -65,6 +65,7 @@ public sealed class CassetteShelf : MonoBehaviour
     }
 
     private const string DefaultCassettePrefabPath = "Assets/_Project/Prefabs/Interaction/Cassette/CasetteTape.prefab";
+    private const string DefaultHoverSoundPath = "Assets/_Project/Audio/SFX/Radio/radio_click.mp3";
     private const string CassetteRootName = "CassetteRoot";
 
     [Header("References")]
@@ -80,7 +81,15 @@ public sealed class CassetteShelf : MonoBehaviour
     [SerializeField] [Min(0f)] private float horizontalSpacing = 0.11f;
     [SerializeField] [Min(0f)] private float verticalSpacing = 0.14f;
     [SerializeField] private float depthOffset;
+    [SerializeField] private Vector3 cassetteScale = new Vector3(0.3f, 0.3f, 0.3f);
     [SerializeField] private Vector3 cassetteRotationEuler;
+
+    [Header("Hover Feel")]
+    [SerializeField] [Min(0f)] private float hoverSlideDistance = 0.08f;
+    [SerializeField] private AudioClip hoverSoundClip;
+    [SerializeField] [Min(0f)] private float hoverSoundVolume = 0.45f;
+    [SerializeField] private float minHoverPitch = 0.92f;
+    [SerializeField] private float maxHoverPitch = 1.08f;
 
     [Header("Slots")]
     [SerializeField] private List<SlotDefinition> slots = new List<SlotDefinition>();
@@ -99,6 +108,11 @@ public sealed class CassetteShelf : MonoBehaviour
         {
             cassettePrefab = AssetDatabase.LoadAssetAtPath<GameObject>(DefaultCassettePrefabPath);
         }
+
+        if (hoverSoundClip == null)
+        {
+            hoverSoundClip = AssetDatabase.LoadAssetAtPath<AudioClip>(DefaultHoverSoundPath);
+        }
 #endif
 
         EnsureCassetteRoot();
@@ -111,7 +125,17 @@ public sealed class CassetteShelf : MonoBehaviour
         rows = Mathf.Max(1, rows);
         horizontalSpacing = Mathf.Max(0f, horizontalSpacing);
         verticalSpacing = Mathf.Max(0f, verticalSpacing);
+        hoverSlideDistance = Mathf.Max(0f, hoverSlideDistance);
+        minHoverPitch = Mathf.Min(minHoverPitch, maxHoverPitch);
+        maxHoverPitch = Mathf.Max(minHoverPitch, maxHoverPitch);
         EnsureCassetteRoot();
+
+#if UNITY_EDITOR
+        if (hoverSoundClip == null)
+        {
+            hoverSoundClip = AssetDatabase.LoadAssetAtPath<AudioClip>(DefaultHoverSoundPath);
+        }
+#endif
     }
 
     public void SyncSlotsToGrid()
@@ -144,6 +168,8 @@ public sealed class CassetteShelf : MonoBehaviour
         }
 
         int maxIndex = Mathf.Min(Capacity, slots.Count);
+        List<GeneratedCassetteBinding> generatedBindings = new List<GeneratedCassetteBinding>();
+
         for (int index = 0; index < maxIndex; index++)
         {
             SlotDefinition slot = slots[index];
@@ -160,7 +186,7 @@ public sealed class CassetteShelf : MonoBehaviour
 
             Undo.RegisterCreatedObjectUndo(instance, "Rebuild Cassette Shelf");
             instance.transform.SetLocalPositionAndRotation(GetLocalPosition(index), GetLocalRotation());
-            instance.transform.localScale = Vector3.one;
+            instance.transform.localScale = cassetteScale;
             instance.name = BuildCassetteName(index, slot);
 
             CassetteShelfSlot shelfSlot = instance.GetComponent<CassetteShelfSlot>();
@@ -178,11 +204,15 @@ public sealed class CassetteShelf : MonoBehaviour
             HoverMoveInteractable hoverInteractable = instance.GetComponent<HoverMoveInteractable>();
             if (hoverInteractable != null)
             {
+                hoverInteractable.SetHoverSlideDistance(hoverSlideDistance);
+                generatedBindings.Add(new GeneratedCassetteBinding(instance.transform, hoverInteractable));
                 EditorUtility.SetDirty(hoverInteractable);
             }
 
             EditorUtility.SetDirty(instance);
         }
+
+        ApplyHoverAudioPitch(generatedBindings);
 
         EditorUtility.SetDirty(this);
         EditorUtility.SetDirty(cassetteRoot.gameObject);
@@ -240,10 +270,56 @@ public sealed class CassetteShelf : MonoBehaviour
         return baseRotation * Quaternion.Euler(cassetteRotationEuler);
     }
 
+    private void ApplyHoverAudioPitch(List<GeneratedCassetteBinding> generatedBindings)
+    {
+        if (generatedBindings == null || generatedBindings.Count == 0)
+        {
+            return;
+        }
+
+        float minY = float.MaxValue;
+        float maxY = float.MinValue;
+
+        for (int i = 0; i < generatedBindings.Count; i++)
+        {
+            float localY = generatedBindings[i].Transform.localPosition.y;
+            minY = Mathf.Min(minY, localY);
+            maxY = Mathf.Max(maxY, localY);
+        }
+
+        float range = maxY - minY;
+        for (int i = 0; i < generatedBindings.Count; i++)
+        {
+            float localY = generatedBindings[i].Transform.localPosition.y;
+            float normalized = Mathf.Approximately(range, 0f)
+                ? 0.5f
+                : Mathf.InverseLerp(minY, maxY, localY);
+
+            generatedBindings[i].HoverInteractable.ConfigureHoverAudio(
+                hoverSoundClip,
+                hoverSoundVolume,
+                minHoverPitch,
+                maxHoverPitch,
+                normalized);
+        }
+    }
+
     private static string BuildCassetteName(int index, SlotDefinition slot)
     {
         string displayName = slot.ResolveDisplayName();
         string suffix = string.IsNullOrWhiteSpace(displayName) ? slot.State.ToString() : displayName;
         return $"Slot_{index + 1:00}_{suffix.Replace(' ', '_')}";
+    }
+
+    private readonly struct GeneratedCassetteBinding
+    {
+        public GeneratedCassetteBinding(Transform transform, HoverMoveInteractable hoverInteractable)
+        {
+            Transform = transform;
+            HoverInteractable = hoverInteractable;
+        }
+
+        public Transform Transform { get; }
+        public HoverMoveInteractable HoverInteractable { get; }
     }
 }
