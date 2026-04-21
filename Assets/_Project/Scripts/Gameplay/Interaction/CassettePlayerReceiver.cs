@@ -1,10 +1,10 @@
+using System;
 using UnityEngine;
 
 [DisallowMultipleComponent]
 public sealed class CassettePlayerReceiver : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private ProgressionManager progressionManager;
     [SerializeField] private DialogueRunner dialogueRunner;
     [SerializeField] private GameObject loadedCassetteVisual;
 
@@ -18,6 +18,8 @@ public sealed class CassettePlayerReceiver : MonoBehaviour
     public CassetteData LoadedCassette => loadedCassette;
     public bool HasLoadedCassette => loadedCassette != null;
     public CassetteData PendingPlaybackCassette => pendingPlaybackCassette;
+    public event Action<CassetteData> CassetteLoaded;
+    public event Action<CassetteData> CassetteReleased;
 
     private void Awake()
     {
@@ -35,115 +37,64 @@ public sealed class CassettePlayerReceiver : MonoBehaviour
         RefreshSubscriptions(clearOnly: true);
     }
 
+    public bool CanSelectCassette(CassetteData cassette)
+    {
+        return cassette != null && loadedCassette == null;
+    }
+
     public bool TrySelectCassette(CassetteData cassette)
     {
-        if (cassette == null)
+        if (!CanSelectCassette(cassette))
         {
-            Debug.LogWarning("CassettePlayerReceiver rejected a null cassette selection.", this);
             return false;
         }
 
         ResolveReferences();
 
-        if (loadedCassette != null && loadedCassette != cassette && !replaceLoadedCassette)
-        {
-            Debug.LogWarning(
-                $"CassettePlayerReceiver blocked selecting '{cassette.CassetteName}' because '{loadedCassette.CassetteName}' is already loaded.",
-                this);
-            return false;
-        }
-
-        CassetteData previousCassette = loadedCassette;
         loadedCassette = cassette;
+        pendingPlaybackCassette = null;
         RefreshVisualState();
-
-        if (progressionManager != null && !progressionManager.SelectCassette(cassette))
-        {
-            loadedCassette = previousCassette;
-            RefreshVisualState();
-            Debug.LogWarning(
-                $"CassettePlayerReceiver could not select '{cassette.CassetteName}' during step {progressionManager.CurrentObjectiveStep}.",
-                this);
-            return false;
-        }
-
-        RefreshVisualState();
+        CassetteLoaded?.Invoke(loadedCassette);
         return true;
     }
 
     public bool TryPlayLoadedCassette()
     {
         ResolveReferences();
-        TryRestoreLoadedCassetteFromProgression();
-
         if (loadedCassette == null)
         {
-            Debug.LogWarning("CassettePlayerReceiver could not play because no cassette is loaded.", this);
             return false;
         }
 
-        if (progressionManager != null && !progressionManager.CanPlayCassette(loadedCassette))
+        if (loadedCassette.BroadcastConversation == null)
         {
-            Debug.LogWarning(
-                $"CassettePlayerReceiver blocked playback for '{loadedCassette.CassetteName}' during step {progressionManager.CurrentObjectiveStep}.",
-                this);
-            return false;
-        }
-
-        if (loadedCassette.BroadcastConversation != null)
-        {
-            if (dialogueRunner == null)
-            {
-                Debug.LogWarning("CassettePlayerReceiver could not find a DialogueRunner to play the loaded cassette.", this);
-                return false;
-            }
-
-            pendingPlaybackCassette = loadedCassette;
-            Debug.Log($"CassettePlayerReceiver started playback for '{loadedCassette.CassetteName}'.", this);
-            if (!dialogueRunner.StartConversation(loadedCassette.BroadcastConversation))
-            {
-                pendingPlaybackCassette = null;
-                return false;
-            }
-
+            ReleaseLoadedCassette();
             return true;
         }
 
-        progressionManager?.MarkCassettePlaybackStarted(loadedCassette);
-        return true;
+        if (dialogueRunner == null)
+        {
+            return false;
+        }
+
+        pendingPlaybackCassette = loadedCassette;
+        if (dialogueRunner.StartConversation(loadedCassette.BroadcastConversation))
+        {
+            return true;
+        }
+
+        pendingPlaybackCassette = null;
+        return false;
     }
 
     private void ResolveReferences()
     {
-        if (progressionManager == null)
-        {
-            progressionManager = FindAnyObjectByType<ProgressionManager>();
-        }
-
         if (dialogueRunner == null)
         {
             dialogueRunner = FindAnyObjectByType<DialogueRunner>();
         }
 
         RefreshSubscriptions();
-    }
-
-    private void TryRestoreLoadedCassetteFromProgression()
-    {
-        if (loadedCassette != null || progressionManager == null)
-        {
-            return;
-        }
-
-        CassetteData selectedCassette = progressionManager.SelectedCassetteToday;
-        if (selectedCassette == null || progressionManager.CurrentObjectiveStep != GameJamObjectiveStep.PlayCassette)
-        {
-            return;
-        }
-
-        loadedCassette = selectedCassette;
-        RefreshVisualState();
-        Debug.Log($"CassettePlayerReceiver restored '{selectedCassette.CassetteName}' from progression state.", this);
     }
 
     private void HandleConversationEnded(DialogueConversation conversation)
@@ -158,12 +109,7 @@ public sealed class CassettePlayerReceiver : MonoBehaviour
             return;
         }
 
-        bool playbackMarkedComplete = progressionManager != null &&
-                                      progressionManager.MarkCassettePlaybackStarted(pendingPlaybackCassette);
-        Debug.Log(
-            $"CassettePlayerReceiver finished '{pendingPlaybackCassette.CassetteName}'. Playback marked complete: {playbackMarkedComplete}.",
-            this);
-        pendingPlaybackCassette = null;
+        ReleaseLoadedCassette();
     }
 
     private void RefreshVisualState()
@@ -171,6 +117,19 @@ public sealed class CassettePlayerReceiver : MonoBehaviour
         if (loadedCassetteVisual != null)
         {
             loadedCassetteVisual.SetActive(loadedCassette != null);
+        }
+    }
+
+    private void ReleaseLoadedCassette()
+    {
+        CassetteData releasedCassette = loadedCassette;
+        loadedCassette = null;
+        pendingPlaybackCassette = null;
+        RefreshVisualState();
+
+        if (releasedCassette != null)
+        {
+            CassetteReleased?.Invoke(releasedCassette);
         }
     }
 

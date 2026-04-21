@@ -49,17 +49,6 @@ public static class PrototypeGeneratorPrefabBuilder
             switchBox.transform.localPosition = new Vector3(0.36f, 0.84f, 0.42f);
             switchBox.transform.localScale = new Vector3(0.32f, 0.32f, 0.12f);
 
-            GameObject leverPivot = new GameObject("LeverPivot");
-            leverPivot.transform.SetParent(switchBox.transform, false);
-            leverPivot.transform.localPosition = new Vector3(0f, 0f, 0.06f);
-            leverPivot.transform.localRotation = Quaternion.Euler(-38f, 0f, 0f);
-
-            GameObject lever = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            lever.name = "Lever";
-            lever.transform.SetParent(leverPivot.transform, false);
-            lever.transform.localPosition = new Vector3(0f, -0.12f, 0f);
-            lever.transform.localScale = new Vector3(0.06f, 0.24f, 0.06f);
-
             GameObject indicator = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             indicator.name = "Indicator";
             indicator.transform.SetParent(root.transform, false);
@@ -70,14 +59,12 @@ public static class PrototypeGeneratorPrefabBuilder
             Renderer baseRenderer = baseBlock.GetComponent<Renderer>();
             Renderer exhaustRenderer = exhaust.GetComponent<Renderer>();
             Renderer switchRenderer = switchBox.GetComponent<Renderer>();
-            Renderer leverRenderer = lever.GetComponent<Renderer>();
             Renderer indicatorRenderer = indicator.GetComponent<Renderer>();
 
             SetShadowMode(bodyRenderer);
             SetShadowMode(baseRenderer);
             SetShadowMode(exhaustRenderer);
             SetShadowMode(switchRenderer);
-            SetShadowMode(leverRenderer);
             SetShadowMode(indicatorRenderer);
 
             SetLayerRecursively(root, interactableLayer >= 0 ? interactableLayer : root.layer);
@@ -87,10 +74,6 @@ public static class PrototypeGeneratorPrefabBuilder
             SetFieldValue(interactable, "turnOffPrompt", "Turn Off Generator");
             SetFieldValue(interactable, "startsOn", false);
             SetFieldValue(interactable, "activeStateRenderers", new Renderer[] { indicatorRenderer });
-            SetFieldValue(interactable, "leverPivot", leverPivot.transform);
-            SetFieldValue(interactable, "offLeverLocalEulerAngles", new Vector3(-38f, 0f, 0f));
-            SetFieldValue(interactable, "onLeverLocalEulerAngles", new Vector3(38f, 0f, 0f));
-            SetFieldValue(interactable, "leverMoveSpeed", 8f);
             SetFieldValue(interactable, "inactiveColor", new Color(0.2f, 0.04f, 0.04f, 1f));
             SetFieldValue(interactable, "activeColor", new Color(0.2f, 1f, 0.35f, 1f));
             PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
@@ -146,9 +129,8 @@ public static class PrototypeGeneratorPrefabBuilder
         GeneratorInteractable interactable = prefab.GetComponent<GeneratorInteractable>();
         Transform indicator = prefab.transform.Find("Indicator");
         Transform body = prefab.transform.Find("Body");
-        Transform leverPivot = prefab.transform.Find("SwitchBox/LeverPivot");
 
-        return interactable == null || indicator == null || body == null || leverPivot == null;
+        return interactable == null || indicator == null || body == null;
     }
 
     private static void EnsureFolder(string parentPath, string folderName)

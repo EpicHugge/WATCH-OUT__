@@ -16,6 +16,7 @@ public sealed class HoverMoveInteractable : InteractableBase
     private Vector3 originalPosition;
     private bool isHovered;
 
+    public Transform ObjectToMove => objectToMove;
     public UnityEvent OnInteractEvent => onInteract;
 
     protected override void Awake()

@@ -6,8 +6,9 @@ public sealed class CassetteInteractable : InteractableBase
 {
     [Header("Cassette")]
     [SerializeField] private CassetteData cassetteData;
-    [SerializeField] private ProgressionManager progressionManager;
+    [SerializeField] private CassettePlayerReceiver cassettePlayerReceiver;
     [SerializeField] private string defaultPrompt = "Insert Cassette";
+    [SerializeField] private string alreadyCarryingPrompt = "Already Carrying Cassette";
     [SerializeField] private bool disableOnSelect = true;
     [SerializeField] private GameObject objectToDisable;
 
@@ -17,18 +18,25 @@ public sealed class CassetteInteractable : InteractableBase
     protected override void Awake()
     {
         base.Awake();
-        
-        if (progressionManager == null)
+
+        if (cassettePlayerReceiver == null)
         {
-            progressionManager = FindAnyObjectByType<ProgressionManager>();
+            cassettePlayerReceiver = FindAnyObjectByType<CassettePlayerReceiver>();
         }
+    }
+
+    public override bool CanInteract(PlayerInteractionController interactor)
+    {
+        return base.CanInteract(interactor) && cassetteData != null;
     }
 
     public override string GetInteractionPrompt(PlayerInteractionController interactor)
     {
-        if (IsLocked)
+        ResolveReceiver();
+
+        if (cassettePlayerReceiver != null && !cassettePlayerReceiver.CanSelectCassette(cassetteData))
         {
-            return base.GetInteractionPrompt(interactor);
+            return alreadyCarryingPrompt;
         }
 
         if (cassetteData != null)
@@ -41,21 +49,32 @@ public sealed class CassetteInteractable : InteractableBase
 
     protected override void InteractInternal(PlayerInteractionController interactor)
     {
-        if (progressionManager == null || cassetteData == null)
+        ResolveReceiver();
+
+        if (cassetteData == null || cassettePlayerReceiver == null)
         {
-            Debug.LogWarning("Missing ProgressionManager or CassetteData on CassetteInteractable.", this);
             return;
         }
 
-        if (progressionManager.SelectCassette(cassetteData))
+        if (!cassettePlayerReceiver.TrySelectCassette(cassetteData))
         {
-            onCassetteSelected?.Invoke();
+            return;
+        }
 
-            if (disableOnSelect)
-            {
-                GameObject target = objectToDisable != null ? objectToDisable : gameObject;
-                target.SetActive(false);
-            }
+        onCassetteSelected?.Invoke();
+
+        if (disableOnSelect)
+        {
+            GameObject target = objectToDisable != null ? objectToDisable : gameObject;
+            target.SetActive(false);
+        }
+    }
+
+    private void ResolveReceiver()
+    {
+        if (cassettePlayerReceiver == null)
+        {
+            cassettePlayerReceiver = FindAnyObjectByType<CassettePlayerReceiver>();
         }
     }
 }

@@ -79,6 +79,7 @@ GameObject:
   - component: {fileID: 3361206437226651142}
   - component: {fileID: 5483996019513277820}
   - component: {fileID: 118734536505572594}
+  - component: {fileID: 2841386910421609323}
   - component: {fileID: 1907615253950967449}
   - component: {fileID: 4098561284557123478}
   m_Layer: 0
@@ -161,6 +162,29 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &2841386910421609323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1845872093932976244}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d6acc506ecee754bb0fff1a11f5aac0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueRunner
+  playerInput: {fileID: 0}
+  interactionController: {fileID: 0}
+  playerController: {fileID: 0}
+  dialogueUI: {fileID: 0}
+  typewriter: {fileID: 0}
+  voicePlayer: {fileID: 0}
+  cameraShake: {fileID: 0}
+  keyboardAdvanceKey: 19
+  keyboardAlternateAdvanceKey: 1
+  gamepadAdvanceButton: 6
+  charactersPerSecond: 60
 --- !u!114 &1907615253950967449
 MonoBehaviour:
   m_ObjectHideFlags: 0

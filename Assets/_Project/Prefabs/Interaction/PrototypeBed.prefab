@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2275390050795789330}
   - component: {fileID: 8364074423108407797}
-  - component: {fileID: 1247727502098278205}
   m_Layer: 0
   m_Name: PrototypeBed
   m_TagString: Untagged
@@ -50,13 +49,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SleepBedInteractable
   interactionEnabled: 1
-  startsLocked: 0
   interactionVerb: Use
   interactionDisplayName: Bed
-  lockedPrompt: Locked
-  onLockedInteract:
-    m_PersistentCalls:
-      m_Calls: []
   sleepPoint: {fileID: 1327101594839796771}
   standUpPoint: {fileID: 4595100171210647117}
   sleepController: {fileID: 0}
@@ -67,22 +61,6 @@ MonoBehaviour:
   onSleepFinished:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &1247727502098278205
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1607419250942982055}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d9d2cde23721fc4dba9ca301478d70b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProgressionInteractablePhaseGate
-  progressionManager: {fileID: 0}
-  targetInteractable: {fileID: 8364074423108407797}
-  unlockWhenManagerMissing: 1
-  allowedPhases: 0400000005000000
 --- !u!1 &4734486960310357504
 GameObject:
   m_ObjectHideFlags: 0

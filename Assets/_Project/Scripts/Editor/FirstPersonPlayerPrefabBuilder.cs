@@ -9,7 +9,7 @@ public static class FirstPersonPlayerPrefabBuilder
 {
     private const string PrefabPath = "Assets/_Project/Prefabs/Player/FirstPersonPlayer.prefab";
     private const string InputActionsPath = "Assets/_Project/Input/InputSystem_Actions.inputactions";
-    private const string ProjectFontPath = "Assets/_Project/UI/Fonts/VCR_OSD_MONO_1.001.ttf";
+    private const string ProjectFontPath = "Assets/_Project/Resources/Fonts/VCR_OSD_MONO_1.001.ttf";
     private static bool buildQueued;
 
     [MenuItem("Tools/Build First Person Player Prefab")]
@@ -46,6 +46,7 @@ public static class FirstPersonPlayerPrefabBuilder
             characterController.skinWidth = 0.08f;
 
             PlayerInput playerInput = root.AddComponent<PlayerInput>();
+            root.AddComponent<DialogueRunner>();
 
             GameObject cameraPivot = new GameObject("CameraPivot");
             cameraPivot.transform.SetParent(root.transform, false);

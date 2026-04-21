@@ -6,7 +6,6 @@ public sealed class RadioInteractable : InteractableBase
 {
     [Header("Radio")]
     [SerializeField] private RadioSystem radioSystem;
-    [SerializeField] private ProgressionManager progressionManager;
     [SerializeField] private bool isIncreaseButton = true;
     [SerializeField] private bool isScanButton;
     [SerializeField] private string prompt = "Tune Up";
@@ -15,44 +14,18 @@ public sealed class RadioInteractable : InteractableBase
     {
         base.Awake();
         ResolveReferences();
-        RefreshLockState();
-    }
-
-    private void OnEnable()
-    {
-        ResolveReferences();
-
-        if (progressionManager != null)
-        {
-            progressionManager.StateChanged += RefreshLockState;
-        }
-
-        RefreshLockState();
-    }
-
-    private void OnDisable()
-    {
-        if (progressionManager != null)
-        {
-            progressionManager.StateChanged -= RefreshLockState;
-        }
     }
 
     public override string GetInteractionPrompt(PlayerInteractionController interactor)
     {
-        if (IsLocked)
-        {
-            return base.GetInteractionPrompt(interactor);
-        }
-
-        return prompt;
+        return CanInteract(interactor) ? prompt : string.Empty;
     }
 
     protected override void InteractInternal(PlayerInteractionController interactor)
     {
+        ResolveReferences();
         if (radioSystem == null)
         {
-            Debug.LogWarning("RadioSystem is missing on RadioInteractable!", this);
             return;
         }
 
@@ -74,12 +47,7 @@ public sealed class RadioInteractable : InteractableBase
 
     protected override void EndInteractInternal(PlayerInteractionController interactor)
     {
-        if (radioSystem == null)
-        {
-            return;
-        }
-
-        if (isScanButton)
+        if (radioSystem == null || isScanButton)
         {
             return;
         }
@@ -105,20 +73,5 @@ public sealed class RadioInteractable : InteractableBase
                 radioSystem = FindAnyObjectByType<RadioSystem>();
             }
         }
-
-        if (progressionManager == null)
-        {
-            progressionManager = FindAnyObjectByType<ProgressionManager>();
-        }
-    }
-
-    private void RefreshLockState()
-    {
-        if (progressionManager == null)
-        {
-            return;
-        }
-
-        SetLocked(!progressionManager.CanUseRadioControls);
     }
 }

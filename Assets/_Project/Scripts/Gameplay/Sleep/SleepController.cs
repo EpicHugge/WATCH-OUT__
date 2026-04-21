@@ -12,7 +12,6 @@ public sealed class SleepController : MonoBehaviour
     [SerializeField] private CharacterController characterController;
     [SerializeField] private Transform cameraPivot;
     [SerializeField] private SleepTransitionUI transitionUI;
-    [SerializeField] private ProgressionManager progressionManager;
 
     [Header("Timing")]
     [SerializeField] [Min(0f)] private float moveIntoBedDuration = 0.9f;
@@ -47,11 +46,6 @@ public sealed class SleepController : MonoBehaviour
         activeBed = bed;
         activeSequence = StartCoroutine(SleepSequenceRoutine(bed));
         SleepSequenceStarted?.Invoke();
-
-        if (SleepSequenceStarted == null)
-        {
-            progressionManager?.EndDay();
-        }
 
         return true;
     }
@@ -107,11 +101,6 @@ public sealed class SleepController : MonoBehaviour
         activeBed = null;
         activeSequence = null;
         SleepSequenceFinished?.Invoke();
-
-        if (SleepSequenceFinished == null)
-        {
-            progressionManager?.CompleteWakeUp();
-        }
 
         completedBed?.NotifySleepSequenceFinished();
     }
@@ -296,20 +285,11 @@ public sealed class SleepController : MonoBehaviour
             }
         }
 
-        if (progressionManager == null)
-        {
-            progressionManager = FindAnyObjectByType<ProgressionManager>();
-        }
     }
 
     private void AdvanceDay()
     {
         onAdvanceDay?.Invoke();
         DayAdvanced?.Invoke();
-
-        if (DayAdvanced == null)
-        {
-            progressionManager?.AdvanceToNextDay();
-        }
     }
 }

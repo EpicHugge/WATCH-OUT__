@@ -1,5 +1,5 @@
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
 [DisallowMultipleComponent]
 public sealed class CassetteShelfItem : InteractableBase
@@ -10,6 +10,7 @@ public sealed class CassetteShelfItem : InteractableBase
     [SerializeField] private GameObject visualToHide;
     [SerializeField] private Collider interactionCollider;
     [SerializeField] private string prompt = "Take Cassette";
+    [SerializeField] private string alreadyCarryingPrompt = "Already Carrying Cassette";
 
     [Header("Hover")]
     [SerializeField] private Transform hoverVisual;
@@ -26,17 +27,29 @@ public sealed class CassetteShelfItem : InteractableBase
     [SerializeField] private float labelScale = 0.08f;
 
     private TextMeshPro labelText;
-
     private Vector3 hoverVisualStartLocalPosition;
     private bool isHovered;
     private bool hasBeenPickedUp;
+    private CassettePlayerReceiver subscribedCassettePlayerReceiver;
 
     protected override void Awake()
     {
         base.Awake();
         ResolveReferences();
+        RefreshSubscriptions();
         hoverVisualStartLocalPosition = hoverVisual != null ? hoverVisual.localPosition : Vector3.zero;
         EnsureLabel();
+    }
+
+    private void OnEnable()
+    {
+        ResolveReferences();
+        RefreshSubscriptions();
+    }
+
+    private void OnDisable()
+    {
+        RefreshSubscriptions(clearOnly: true);
     }
 
     private void Update()
@@ -57,14 +70,16 @@ public sealed class CassetteShelfItem : InteractableBase
 
     public override bool CanInteract(PlayerInteractionController interactor)
     {
-        return !hasBeenPickedUp && base.CanInteract(interactor);
+        return base.CanInteract(interactor) && !hasBeenPickedUp && cassetteData != null;
     }
 
     public override string GetInteractionPrompt(PlayerInteractionController interactor)
     {
-        if (IsLocked)
+        ResolveReferences();
+
+        if (cassettePlayerReceiver != null && !cassettePlayerReceiver.CanSelectCassette(cassetteData))
         {
-            return base.GetInteractionPrompt(interactor);
+            return alreadyCarryingPrompt;
         }
 
         if (cassetteData != null)
@@ -91,7 +106,6 @@ public sealed class CassetteShelfItem : InteractableBase
 
         if (cassetteData == null || cassettePlayerReceiver == null)
         {
-            Debug.LogWarning("CassetteShelfItem is missing a CassetteData or CassettePlayerReceiver reference.", this);
             return;
         }
 
@@ -108,8 +122,7 @@ public sealed class CassetteShelfItem : InteractableBase
             interactionCollider.enabled = false;
         }
 
-        GameObject targetVisual = visualToHide != null ? visualToHide : gameObject;
-        targetVisual.SetActive(false);
+        SetVisualVisible(false);
     }
 
     private void ResolveReferences()
@@ -121,7 +134,9 @@ public sealed class CassetteShelfItem : InteractableBase
 
         if (visualToHide == null)
         {
-            visualToHide = hoverVisual != null ? hoverVisual.gameObject : gameObject;
+            visualToHide = hoverVisual != null && hoverVisual.gameObject != gameObject
+                ? hoverVisual.gameObject
+                : (transform.childCount > 0 ? transform.GetChild(0).gameObject : gameObject);
         }
 
         if (interactionCollider == null)
@@ -133,6 +148,8 @@ public sealed class CassetteShelfItem : InteractableBase
         {
             hoverVisual = transform;
         }
+
+        RefreshSubscriptions();
     }
 
     private void EnsureLabel()
@@ -177,5 +194,59 @@ public sealed class CassetteShelfItem : InteractableBase
         }
 
         return "CASSETTE";
+    }
+
+    private void HandleCassetteReleased(CassetteData cassette)
+    {
+        if (!hasBeenPickedUp || cassetteData == null || cassette != cassetteData)
+        {
+            return;
+        }
+
+        hasBeenPickedUp = false;
+        SetInteractionEnabled(true);
+
+        if (interactionCollider != null)
+        {
+            interactionCollider.enabled = true;
+        }
+
+        SetVisualVisible(true);
+    }
+
+    private void RefreshSubscriptions(bool clearOnly = false)
+    {
+        if (subscribedCassettePlayerReceiver != null)
+        {
+            subscribedCassettePlayerReceiver.CassetteReleased -= HandleCassetteReleased;
+            subscribedCassettePlayerReceiver = null;
+        }
+
+        if (clearOnly || !isActiveAndEnabled || cassettePlayerReceiver == null)
+        {
+            return;
+        }
+
+        cassettePlayerReceiver.CassetteReleased += HandleCassetteReleased;
+        subscribedCassettePlayerReceiver = cassettePlayerReceiver;
+    }
+
+    private void SetVisualVisible(bool isVisible)
+    {
+        GameObject targetVisual = visualToHide != null ? visualToHide : gameObject;
+        if (targetVisual != gameObject)
+        {
+            targetVisual.SetActive(isVisible);
+            return;
+        }
+
+        Renderer[] renderers = GetComponentsInChildren<Renderer>(true);
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            if (renderers[i] != null)
+            {
+                renderers[i].enabled = isVisible;
+            }
+        }
     }
 }
