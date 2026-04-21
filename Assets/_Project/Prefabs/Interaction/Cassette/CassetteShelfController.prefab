@@ -1,0 +1,154 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4799715280118515623
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1245369548149110078}
+  m_Layer: 0
+  m_Name: CassetteRoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1245369548149110078
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4799715280118515623}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5989259929491611348}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6423902335507085855
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6422434410034291150}
+  m_Layer: 0
+  m_Name: CassetteRoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6422434410034291150
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6423902335507085855}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5989259929491611348}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7469957453976995660
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5989259929491611348}
+  - component: {fileID: 6284777379007123702}
+  m_Layer: 0
+  m_Name: CassetteShelfController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5989259929491611348
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7469957453976995660}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1245369548149110078}
+  - {fileID: 6422434410034291150}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6284777379007123702
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7469957453976995660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27b219c9d0e35764bb5b49cafc582ed5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CassetteShelf
+  cassettePrefab: {fileID: 7929567495511250229, guid: eb2b8af7391fa50469451fa5463b0e32, type: 3}
+  cassetteRoot: {fileID: 6422434410034291150}
+  cassettePlayerReceiver: {fileID: 0}
+  placementAnchor: {fileID: 0}
+  columns: 4
+  rows: 2
+  localStartPoint: {x: 0, y: 0, z: 0}
+  horizontalSpacing: 0.11
+  verticalSpacing: 0.14
+  depthOffset: 0
+  cassetteRotationEuler: {x: 0, y: 0, z: 0}
+  slots:
+  - cassetteData: {fileID: 0}
+    state: 0
+    overrideDisplayName: 
+    overrideInteractionText: 
+  - cassetteData: {fileID: 0}
+    state: 0
+    overrideDisplayName: 
+    overrideInteractionText: 
+  - cassetteData: {fileID: 0}
+    state: 0
+    overrideDisplayName: 
+    overrideInteractionText: 
+  - cassetteData: {fileID: 0}
+    state: 0
+    overrideDisplayName: 
+    overrideInteractionText: 
+  - cassetteData: {fileID: 0}
+    state: 0
+    overrideDisplayName: 
+    overrideInteractionText: 
+  - cassetteData: {fileID: 0}
+    state: 0
+    overrideDisplayName: 
+    overrideInteractionText: 
+  - cassetteData: {fileID: 0}
+    state: 0
+    overrideDisplayName: 
+    overrideInteractionText: 
+  - cassetteData: {fileID: 0}
+    state: 0
+    overrideDisplayName: 
+    overrideInteractionText: 
