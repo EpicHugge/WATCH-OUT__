@@ -36,11 +36,14 @@ public sealed class CassetteShelfSlot : MonoBehaviour
     public bool IsHiddenState => slotMode == SlotMode.Hidden;
     public CassetteData CassetteData => cassetteData;
 
+    private CassetteTapeLabelDisplay labelDisplay;
+
     private void Awake()
     {
         ResolveReferences();
         ApplyPrompt();
         RefreshAvailabilityState();
+        RefreshLabelDisplay();
     }
 
     private void OnEnable()
@@ -48,6 +51,7 @@ public sealed class CassetteShelfSlot : MonoBehaviour
         ResolveReferences();
         RefreshSubscriptions();
         RefreshAvailabilityState();
+        RefreshLabelDisplay();
     }
 
     private void OnDisable()
@@ -60,6 +64,7 @@ public sealed class CassetteShelfSlot : MonoBehaviour
         ResolveReferences();
         ApplyPrompt();
         RefreshAvailabilityState();
+        RefreshLabelDisplay();
     }
 
     public void HandleInteract()
@@ -95,6 +100,11 @@ public sealed class CassetteShelfSlot : MonoBehaviour
         if (hoverInteractable == null)
         {
             hoverInteractable = GetComponent<HoverMoveInteractable>();
+        }
+
+        if (labelDisplay == null)
+        {
+            labelDisplay = GetComponent<CassetteTapeLabelDisplay>();
         }
 
         if (interactionCollider == null)
@@ -220,6 +230,7 @@ public sealed class CassetteShelfSlot : MonoBehaviour
         ApplyPrompt();
         RefreshAvailabilityState();
         SetVisualVisible(!IsHiddenState);
+        RefreshLabelDisplay();
 
         if (interactionCollider != null)
         {
@@ -235,6 +246,14 @@ public sealed class CassetteShelfSlot : MonoBehaviour
         }
 
         return cassetteData != null ? cassetteData.CassetteName : string.Empty;
+    }
+
+    private void RefreshLabelDisplay()
+    {
+        if (labelDisplay != null)
+        {
+            labelDisplay.RefreshLabel();
+        }
     }
 
     private void SetVisualVisible(bool isVisible)
