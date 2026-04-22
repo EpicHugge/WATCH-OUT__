@@ -145,7 +145,7 @@ public sealed class CassetteTapeLabelDisplay : MonoBehaviour
         {
             labelFaces = new[]
             {
-                CreateFace("TapeMain", DefaultLabelOffset, new Vector3(90f, 0f, 0f)),
+                CreateFace("TapeMain", DefaultLabelOffset, new Vector3(90f, 180f, 0f)),
                 CreateFace("TapeMain(1)", DefaultLabelOffset, new Vector3(90f, 0f, 0f)),
                 CreateFace("TapeSide", DefaultLabelOffset, new Vector3(90f, 180f, 0f)),
                 CreateFace("TapeSide(1)", DefaultLabelOffset, new Vector3(90f, 180f, 0f))

@@ -41,6 +41,7 @@ namespace WatchOut
         [Header("Signal Events")]
         [SerializeField] private float signalFadeRange = 0.5f;
         [SerializeField] private float signalLockTolerance = 0.05f;
+        [SerializeField] private bool autoLockSignals = true;
 
         private readonly HashSet<RadioEventData> resolvedEvents = new HashSet<RadioEventData>();
 
@@ -53,10 +54,16 @@ namespace WatchOut
         private RadioEventData currentLockedEvent;
         private MaterialPropertyBlock screenPropertyBlock;
         private DialogueRunner subscribedDialogueRunner;
+        private bool autoLockTemporarilySuppressed;
 
         public float CurrentFrequency => currentFrequency;
         public float DisplayedFrequency => Mathf.Round(currentFrequency * 10f) / 10f;
         public bool IsAutoScanning => isAutoScanning;
+        public bool IsDialogueRunning => dialogueRunner != null && dialogueRunner.IsRunning;
+        public float MinFrequency => minFrequency;
+        public float MaxFrequency => maxFrequency;
+        public float FrequencyStep => frequencyStep;
+        public float SignalFadeRange => Mathf.Max(signalFadeRange, 0.01f);
         public IReadOnlyList<RadioEventData> RadioEvents => radioEvents;
 
         private void Awake()
@@ -144,6 +151,50 @@ namespace WatchOut
             }
         }
 
+        public void SetScan(bool isEnabled)
+        {
+            if (!IsRadioPowered())
+            {
+                isAutoScanning = false;
+                return;
+            }
+
+            if (isAutoScanning == isEnabled)
+            {
+                return;
+            }
+
+            isAutoScanning = isEnabled;
+            if (isAutoScanning)
+            {
+                isIncreasing = false;
+                isDecreasing = false;
+                holdTimer = 0f;
+                changeTimer = 0f;
+            }
+        }
+
+        public void StopTuning()
+        {
+            ResetTuningState();
+        }
+
+        public void SetAutoLockTemporarilySuppressed(bool isSuppressed)
+        {
+            autoLockTemporarilySuppressed = isSuppressed;
+        }
+
+        public bool TryLockSignal(RadioEventData radioEvent)
+        {
+            if (!CanLockSignal(radioEvent))
+            {
+                return false;
+            }
+
+            LockOnSignal(radioEvent);
+            return true;
+        }
+
         private void HandleTuning()
         {
             if (!IsRadioPowered())
@@ -209,13 +260,13 @@ namespace WatchOut
                 return;
             }
 
-            if (!TryGetClosestActiveEvent(out RadioEventData closestEvent, out float closestDistance))
+            if (!TryGetClosestActiveSignal(out RadioEventData closestEvent, out float closestDistance))
             {
                 ResetSignalState();
                 return;
             }
 
-            float fadeRange = Mathf.Max(signalFadeRange, 0.01f);
+            float fadeRange = SignalFadeRange;
             float lockTolerance = Mathf.Max(signalLockTolerance, 0.001f);
 
             if (closestDistance <= fadeRange)
@@ -234,7 +285,9 @@ namespace WatchOut
                     nearSignalAudioSource.volume = Mathf.Lerp(0f, maxNearSignalVolume, signalStrength);
                 }
 
-                if (currentLockedEvent == null &&
+                if (autoLockSignals &&
+                    !autoLockTemporarilySuppressed &&
+                    currentLockedEvent == null &&
                     !isAutoScanning &&
                     IsFrequencyWithinLockWindow(currentFrequency, closestEvent.TargetFrequency, lockTolerance))
                 {
@@ -458,7 +511,7 @@ namespace WatchOut
             radioEvents.RemoveAll(candidate => candidate == null);
         }
 
-        private bool TryGetClosestActiveEvent(out RadioEventData closestEvent, out float closestDistance)
+        public bool TryGetClosestActiveSignal(out RadioEventData closestEvent, out float closestDistance)
         {
             closestEvent = null;
             closestDistance = float.MaxValue;
@@ -491,6 +544,32 @@ namespace WatchOut
             }
 
             return closestEvent != null;
+        }
+
+        public bool CanLockSignal(RadioEventData radioEvent)
+        {
+            if (radioEvent == null || !IsRadioPowered() || IsDialogueRunning || currentLockedEvent != null)
+            {
+                return false;
+            }
+
+            if (radioEvent.OneTimeOnly && resolvedEvents.Contains(radioEvent))
+            {
+                return false;
+            }
+
+            CassetteData loadedCassette = cassettePlayerReceiver != null ? cassettePlayerReceiver.LoadedCassette : null;
+            if (!radioEvent.AllowsCassette(loadedCassette))
+            {
+                return false;
+            }
+
+            return IsFrequencyWithinLockWindow(currentFrequency, radioEvent.TargetFrequency);
+        }
+
+        public bool IsFrequencyWithinLockWindow(float tunedFrequency, float targetFrequency)
+        {
+            return IsFrequencyWithinLockWindow(tunedFrequency, targetFrequency, signalLockTolerance);
         }
 
         private bool IsRadioPowered()
