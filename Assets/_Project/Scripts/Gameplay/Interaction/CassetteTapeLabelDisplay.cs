@@ -43,6 +43,7 @@ public sealed class CassetteTapeLabelDisplay : MonoBehaviour
 
     private Material depthTestLabelMaterial;
     private bool ownsDepthTestLabelMaterial;
+    private bool isDisplayVisible = true;
 
     private void Reset()
     {
@@ -129,6 +130,14 @@ public sealed class CassetteTapeLabelDisplay : MonoBehaviour
             ConfigureText(face.text, face);
             ApplyBestFittingText(face, rawLabelText);
         }
+
+        UpdateFaceVisibility();
+    }
+
+    public void SetDisplayVisible(bool isVisible)
+    {
+        isDisplayVisible = isVisible;
+        UpdateFaceVisibility();
     }
 
     private void ResolveReferences()
@@ -599,6 +608,12 @@ public sealed class CassetteTapeLabelDisplay : MonoBehaviour
             Renderer textRenderer = face.text.GetComponent<Renderer>();
             if (textRenderer == null)
             {
+                continue;
+            }
+
+            if (!isDisplayVisible)
+            {
+                textRenderer.enabled = false;
                 continue;
             }
 

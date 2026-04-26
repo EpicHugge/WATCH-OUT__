@@ -253,11 +253,17 @@ public sealed class CassetteShelfSlot : MonoBehaviour
         if (labelDisplay != null)
         {
             labelDisplay.RefreshLabel();
+            labelDisplay.SetDisplayVisible(!hasBeenPickedUp && !IsHiddenState);
         }
     }
 
     private void SetVisualVisible(bool isVisible)
     {
+        if (labelDisplay != null)
+        {
+            labelDisplay.SetDisplayVisible(isVisible);
+        }
+
         GameObject targetVisual = visualToHide != null ? visualToHide : gameObject;
         if (targetVisual != gameObject)
         {
